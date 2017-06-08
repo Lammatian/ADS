@@ -12,6 +12,7 @@ class TestClass(object):
 		assert str(l) == "1 -> 2 -> 3 -> 4"
 		assert l.length == 4
 
+
 	def test_lookup(self):
 		l = LinkedList([1,2,3,4])
 
