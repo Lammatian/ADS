@@ -1,6 +1,5 @@
 class Node(object):
 	"""Single node of the linked list with a value"""
-
 	def __init__(self, val):
 		"""
 		Initialise a node
@@ -8,14 +7,12 @@ class Node(object):
 		:param val: data held in the node
 		:type val: T
 		"""
-
 		self.val = val
 		self.next = None
 
 
 class LinkedList(object):
 	"""Implementation of linked list with standard methods"""
-
 	def __init__(self, vals):
 		"""
 		Initialise a linked list given an array of values
@@ -23,7 +20,6 @@ class LinkedList(object):
 		:param vals: values for the list
 		:type vals: T[]
 		"""
-
 		self.length = len(vals)
 
 		if not vals:
@@ -43,11 +39,13 @@ class LinkedList(object):
 
 
 	def __iter__(self):
+		"""Iterator"""
 		self.iter = self.head
 		return self
 
 
 	def __next__(self):
+		"""For iterator"""
 		if not self.iter:
 			raise StopIteration
 		else:
@@ -57,14 +55,12 @@ class LinkedList(object):
 
 
 	def __repr__(self):
-		"""return representation of the linked list"""
-
+		"""Return representation of the linked list"""
 		return "LinkedList([" + ','.join(map(str, self)) + "])"
 
 
 	def __str__(self):
-		"""return str(self)"""
-
+		"""Return str(self)"""
 		return ' -> '.join(map(str, self))
 
 
@@ -77,7 +73,6 @@ class LinkedList(object):
 		:param n: index to get
 		:type n: int
 		"""
-
 		if n > self.length-1:
 			raise IndexError("index out of range")
 		else:
@@ -98,7 +93,6 @@ class LinkedList(object):
 		:type val: T
 		:type p: Node
 		"""
-
 		current_successor = p.next
 		p.next = Node(val)
 		p.next.next = current_successor
@@ -113,7 +107,6 @@ class LinkedList(object):
 		:param val: value to be inserted
 		:type val: T
 		"""
-
 		new_head = Node(val)
 		new_head.next = self.head
 		self.head = new_head
@@ -128,7 +121,6 @@ class LinkedList(object):
 		:param p: predecessor node
 		:type p: Node
 		"""
-
 		if p.next:
 			p.next = p.next.next
 			self.length -= 1
@@ -136,7 +128,6 @@ class LinkedList(object):
 
 	def removeFirst(self):
 		"""Remove the first node of the list if it exists"""
-
 		if self.head:
 			self.head = self.head.next
 			self.length -= 1
@@ -149,11 +140,11 @@ class LinkedList(object):
 		:param target: value to be deleted
 		:type target: T
 		"""
-
 		dummy = self.head
 
 		if self.head.val == target:
 			self.head = self.head.next
+			self.length -= 1
 		else:
 			while self.head.next:
 				if self.head.next.val == target:
