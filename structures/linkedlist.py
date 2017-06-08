@@ -39,6 +39,34 @@ class LinkedList(object):
 			self.head = self.head.next
 
 		self.head = dummy
+		self.iter = self.head
+
+
+	def __iter__(self):
+		self.iter = self.head
+		return self
+
+
+	def __next__(self):
+		if not self.iter:
+			raise StopIteration
+		else:
+			prev = self.iter
+			self.iter = self.iter.next
+			return prev.val
+
+
+	def __repr__(self):
+		"""return representation of the linked list"""
+
+		return "LinkedList([" + ','.join(map(str, self)) + "])"
+
+
+	def __str__(self):
+		"""return str(self)"""
+
+		return ' -> '.join(map(str, self))
+
 
 	def lookup(self, n):
 		"""
@@ -50,8 +78,8 @@ class LinkedList(object):
 		:type n: int
 		"""
 
-		if n > self.length:
-			return "Out of bounds."
+		if n > self.length-1:
+			raise IndexError("index out of range")
 		else:
 			dummy = self.head
 
@@ -59,6 +87,7 @@ class LinkedList(object):
 				dummy = dummy.next
 
 			return dummy.val
+
 
 	def insert(self, val, p): 
 		"""
@@ -74,6 +103,9 @@ class LinkedList(object):
 		p.next = Node(val)
 		p.next.next = current_successor
 
+		self.length += 1
+
+
 	def insertFirst(self, val):
 		"""
 		Insert a value at the beginning of the list
@@ -86,6 +118,9 @@ class LinkedList(object):
 		new_head.next = self.head
 		self.head = new_head
 
+		self.length += 1
+
+
 	def remove(self, p):
 		"""
 		Remove a node after the given node if it exists
@@ -96,12 +131,16 @@ class LinkedList(object):
 
 		if p.next:
 			p.next = p.next.next
+			self.length -= 1
+
 
 	def removeFirst(self):
 		"""Remove the first node of the list if it exists"""
 
 		if self.head:
 			self.head = self.head.next
+			self.length -= 1
+
 
 	def delete(self, target):
 		"""
@@ -119,22 +158,9 @@ class LinkedList(object):
 			while self.head.next:
 				if self.head.next.val == target:
 					self.head.next = self.head.next.next
+					self.length -= 1
 					break
 
 				self.head = self.head.next
 
 			self.head = dummy
-
-	def show(self):
-		"""For testing"""
-		dummy = self.head
-
-		while dummy:
-			print(dummy.val, end="")
-
-			if dummy.next:
-				print(" -> ", end="")
-
-			dummy = dummy.next
-
-		print()
