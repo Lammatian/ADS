@@ -51,17 +51,17 @@ class LinkedList(object):
 		else:
 			prev = self.iter
 			self.iter = self.iter.next
-			return prev.val
+			return prev
 
 
 	def __repr__(self):
 		"""Return representation of the linked list"""
-		return "LinkedList([" + ','.join(map(str, self)) + "])"
+		return "LinkedList([" + ','.join([str(n.val) for n in self]) + "])"
 
 
 	def __str__(self):
 		"""Return str(self)"""
-		return ' -> '.join(map(str, self))
+		return ' -> '.join([str(n.val) for n in self])
 
 
 	def lookup(self, n):
