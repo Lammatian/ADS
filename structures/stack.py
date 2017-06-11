@@ -12,20 +12,49 @@ class Stack(object):
     """
     def __init__(self):
         """Initialise an empty stack"""
-        self.stack = dynamicarray.DArray([])
-        self.top = None
+        self._stack = dynamicarray.DArray([])
+        self._top = None
 
 
     def __repr__(self):
         """Representation of stack"""
-        pass
+        return super(Stack, self).__repr__()
 
 
     def __str__(self):
         """Return str(self)"""
-        pass
+        return repr(self)
 
 
     def isEmpty(self):
         """Check if the stack is empty"""
-        return self.stack.length == 0
+        return self._stack.length == 0
+
+
+    def peek(self):
+        """Peek at the top element of the stack"""
+        return self._top
+
+
+    def push(self, n):
+        """Put an element on top of the stack"""
+        self._stack.insertLast(n)
+        self._top = n
+
+
+    def pop(self):
+        """
+        Take the top element from the stack and return it
+
+        Do nothing if the stack is empty
+        """
+        if not self.isEmpty():
+            self._stack.removeLast()
+            last_top = self._top
+
+            if self._stack.length:
+                self._top = self._stack.lookup(self._stack.length-1)
+            else:
+                self._top = None
+
+            return last_top

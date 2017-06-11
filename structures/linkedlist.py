@@ -1,19 +1,19 @@
-class Node(object):
-	"""Single node of the linked list with a value"""
-	def __init__(self, val):
-		"""
-		Initialise a node
-
-		:param val: data held in the node
-		:type val: T
-		"""
-		self.val = val
-		self.next = None
-
-
 class LinkedList(object):
 	"""Implementation of linked list with standard methods"""
-	def __init__(self, vals):
+	class Node(object):
+		"""Single node of the linked list with a value"""
+		def __init__(self, val):
+			"""
+			Initialise a node
+
+			:param val: data held in the node
+			:type val: T
+			"""
+			self.val = val
+			self.next = None
+
+
+	def __init__(self, vals=[]):
 		"""
 		Initialise a linked list given an array of values
 
@@ -26,12 +26,12 @@ class LinkedList(object):
 			self.head = None
 			return
 
-		self.head = Node(vals[0])
+		self.head = LinkedList.Node(vals[0])
 
 		dummy = self.head
 
 		for v in vals[1:]:
-			self.head.next = Node(v)
+			self.head.next = LinkedList.Node(v)
 			self.head = self.head.next
 
 		self.head = dummy
@@ -94,7 +94,7 @@ class LinkedList(object):
 		:type p: Node
 		"""
 		current_successor = p.next
-		p.next = Node(val)
+		p.next = LinkedList.Node(val)
 		p.next.next = current_successor
 
 		self.length += 1
@@ -107,7 +107,7 @@ class LinkedList(object):
 		:param val: value to be inserted
 		:type val: T
 		"""
-		new_head = Node(val)
+		new_head = LinkedList.Node(val)
 		new_head.next = self.head
 		self.head = new_head
 

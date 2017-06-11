@@ -1,20 +1,20 @@
-class Node(object):
-	"""Single node of the doubly linked list with a value"""
-	def __init__(self, val):
-		"""
-		Initialise a node
-
-		:param val: data held in the node
-		:type val: T
-		"""
-		self.val = val
-		self.prev = None
-		self.next = None
-
-
 class DLinkedList(object):
 	"""Implementation of doubly linked list with standard methods"""
-	def __init__(self, vals):
+	class Node(object):
+		"""Single node of the doubly linked list with a value"""
+		def __init__(self, val):
+			"""
+			Initialise a node
+
+			:param val: data held in the node
+			:type val: T
+			"""
+			self.val = val
+			self.prev = None
+			self.next = None
+
+
+	def __init__(self, vals=[]):
 		"""
 		Initialise a doubly linked list given an array of values
 
@@ -28,12 +28,12 @@ class DLinkedList(object):
 			self.tail = None
 			return
 
-		self.head = Node(vals[0])
+		self.head = DLinkedList.Node(vals[0])
 
 		dummy = self.head
 
 		for i, v in enumerate(vals[1:]):
-			self.head.next = Node(v)
+			self.head.next = DLinkedList.Node(v)
 			self.head.next.prev = self.head
 			self.head = self.head.next
 
@@ -108,7 +108,7 @@ class DLinkedList(object):
 		:type p: Node
 		"""
 		current_predecessor = p.prev
-		p.prev = Node(val)
+		p.prev = DLinkedList.Node(val)
 		p.prev.next = p
 		p.prev.prev = current_predecessor
 
@@ -131,9 +131,9 @@ class DLinkedList(object):
 		:type p: Node
 		"""
 		current_successor = p.next
-		p.next = Node(val)
+		p.next = DLinkedList.Node(val)
 		p.next.prev = p
-		p.next.next = current_successor\
+		p.next.next = current_successor
 
 		if current_successor:
 			p.next.next.prev = p.next
@@ -151,10 +151,14 @@ class DLinkedList(object):
 		:param val: value to be inserted
 		:type val: T
 		"""
-		new_head = Node(val)
-		new_head.next = self.head
-		self.head.prev = new_head
-		self.head = new_head
+		if self.head:
+			new_head = DLinkedList.Node(val)
+			new_head.next = self.head
+			self.head.prev = new_head
+			self.head = new_head
+		else:
+			self.tail = DLinkedList.Node(val)
+			self.head = self.tail
 
 		self.length += 1
 
@@ -166,10 +170,14 @@ class DLinkedList(object):
 		:param val: value to be inserted
 		:type val: T
 		"""
-		new_tail = Node(val)
-		new_tail.prev = self.tail
-		self.tail.next = new_tail
-		self.tail = new_tail
+		if self.head:
+			new_tail = DLinkedList.Node(val)
+			new_tail.prev = self.tail
+			self.tail.next = new_tail
+			self.tail = new_tail
+		else:
+			self.tail = DLinkedList.Node(val)
+			self.head = self.tail
 
 		self.length += 1
 
@@ -191,7 +199,10 @@ class DLinkedList(object):
 		"""Remove the first node of the list if it exists"""
 		if self.head:
 			self.head = self.head.next
-			self.head.prev = None
+			
+			if self.head:
+				self.head.prev = None
+
 			self.length -= 1
 
 
