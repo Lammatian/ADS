@@ -13,14 +13,22 @@ class App(object):
 
         self.titleBorder = Frame(master, highlightthickness=titleBorderWidth, highlightbackground="grey", highlightcolor="grey")
         self.titleBorder.place(x=-titleBorderWidth, y=-titleBorderWidth)
-        self.title = Label(self.titleBorder, text=title, font=("Verdana", 20))
+        self.title = Label(self.titleBorder, text=title, font=("OratorStd", 20))
         self.title.pack(side="top", anchor="w")
 
-        self.opBorder = Frame(master, width=widthpixels+5, height=100, highlightthickness=opBorderWidth, highlightbackground="grey", highlightcolor="grey")
-        self.opBorder.place(x=-2, y=402)
-        self.opBorder.place_propagate(0)
-        self.opText = Label(self.opBorder, text="Operation:", font=("Verdana", 18))
-        self.opText.pack(side="top", anchor="w")
+        self.opBorder = Frame(master, height=100, bg="grey")
+        self.opBorder.pack(side="bottom", fill=BOTH)
+        self.opBorder.pack_propagate(0)
+
+        self.opMenu = Frame(self.opBorder, height=98)
+        self.opMenu.pack(side="bottom", fill=BOTH)
+        self.opMenu.pack_propagate(0)
+
+        self.opText = Label(self.opMenu, text="Operation:", font=("OratorStd", 18))
+        self.opText.pack(side="top", anchor="w", padx=(10,0), pady=(10,0))
+
+        self.operation = Label(self.opMenu, text="current op", font=("OratorStd", 12), fg="green")
+        self.operation.pack(side="top", anchor="w", padx=(10,0))
 
 
 root = Tk()
