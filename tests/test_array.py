@@ -24,19 +24,19 @@ class TestClass(object):
 			a.lookup(-1)
 
 
-	def test_insert(self):
+	def test_put(self):
 		a = Array(3, [1,2])
-		a.insert(1, 5)
+		a.put(1, 5)
 
 		assert str(a) == "[1, 5, None]"
 
 		a = Array(3, [1,2,3])
 
 		with pytest.raises(IndexError):
-			a.insert(-1, 0)
+			a.put(-1, 0)
 
 		with pytest.raises(IndexError):
-			a.insert(3, 0)
+			a.put(3, 0)
 
 
 	def test_find(self):

@@ -11,7 +11,7 @@ class TestClass(object):
 		a = DArray([1,2])
 
 		assert str(a) == "[1, 2]"
-		assert a.length == 2
+		assert a._length == 2
 
 
 	def test_lookup(self):
@@ -31,7 +31,7 @@ class TestClass(object):
 		a.update(0, 4)
 
 		assert str(a) == "[4, 2, 3]"
-		assert a.length == 3
+		assert a._length == 3
 
 		a = DArray([1,2,3])
 		a.update(2, 4)
@@ -50,13 +50,14 @@ class TestClass(object):
 		a.insert(1, 5)
 
 		assert str(a) == "[1, 5, 2]"
-		assert a.length == 3
+		assert a._length == 3
 
 		a = DArray([1,2,3])
 
 		a.insert(1, 0)
 
 		assert str(a) == "[1, 0, 2, 3]"
+		assert a._length == 4
 
 		with pytest.raises(IndexError):
 			a.insert(-1, 0)
@@ -70,7 +71,7 @@ class TestClass(object):
 		a.insertLast(3)
 
 		assert str(a) == "[1, 2, 3]"
-		assert a.length == 3
+		assert a._length == 3
 
 
 	def test_remove(self):
@@ -78,12 +79,12 @@ class TestClass(object):
 		a.remove(2)
 
 		assert str(a) == "[1, 2]"
-		assert a.length == 2
+		assert a._length == 2
 
 		a.remove(1)
 
 		assert str(a) == "[1]"
-		assert a.length == 1
+		assert a._length == 1
 
 		with pytest.raises(IndexError):
 			a.remove(1)
@@ -94,17 +95,17 @@ class TestClass(object):
 		a.removeLast()
 
 		assert str(a) == "[1]"
-		assert a.length == 1
+		assert a._length == 1
 
 		a.removeLast()
 
 		assert str(a) == "[]"
-		assert a.length == 0
+		assert a._length == 0
 
 		a.removeLast()
 
 		assert str(a) == "[]"
-		assert a.length == 0
+		assert a._length == 0
 
 
 	def test_find(self):
