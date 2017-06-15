@@ -19,27 +19,27 @@ class Array(object):
 		if len(vals) > length:
 			raise IndexError("index out of bounds")
 		else:
-			self.vals = [None]*length
+			self._vals = [None]*length
 
 			for i in range(len(vals)):
-				self.vals[i] = vals[i]
+				self._vals[i] = vals[i]
 
-			self.max_length = length
+			self._max_length = length
 
 
 	def __iter__(self):
 		"""Iterator"""
-		return iter(self.vals)
+		return iter(self._vals)
 
 
 	def __repr__(self):
 		"""Representation of the array"""
-		return "Array(" + str(self.max_length) + ", " + str(self.vals) + ")"
+		return super(Array, self).__repr__()
 
 
 	def __str__(self):
 		"""Return str(self)"""
-		return str(self.vals)
+		return str(self._vals)
 
 
 	def lookup(self, n):
@@ -47,23 +47,31 @@ class Array(object):
 		Get n-th element of the array
 
 		Raises error if n out of bounds of the array
+
+		:param n: index in the array
+		:type n: int
 		"""
-		if n < self.max_length and n >= 0:
-			return self.vals[n]
+		if n < self._max_length and n >= 0:
+			return self._vals[n]
 		else:
 			raise IndexError("index out of bounds")
 
 
-	def insert(self, n, val):
+	def put(self, n, val):
 		"""
-		Insert value as the n-th element of the array
+		Insert value at the n-th element of the array
 		If n-th element of the array already contains
 		a value, it gets replaced
 
 		Raises error if n out of bounds of the array
+
+		:param n: index in the array
+		:param val: value to be inserted
+		:type n: int
+		:type val: T
 		"""
-		if n < self.max_length and n >= 0:
-			self.vals[n] = val
+		if n < self._max_length and n >= 0:
+			self._vals[n] = val
 		else:
 			raise IndexError("index out of bounds")
 
@@ -73,8 +81,11 @@ class Array(object):
 		Returns an index of the first occurrence of the value
 
 		If value is not in the array, returns -1
+
+		:param val: value to be found
+		:type val: T
 		"""
 		try:
-			return self.vals.index(val)
+			return self._vals.index(val)
 		except ValueError:
 			return -1

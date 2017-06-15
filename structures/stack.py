@@ -28,7 +28,7 @@ class Stack(object):
 
     def isEmpty(self):
         """Check if the stack is empty"""
-        return self._stack.length == 0
+        return self._stack._length == 0
 
 
     def peek(self):
@@ -52,8 +52,8 @@ class Stack(object):
             self._stack.removeLast()
             last_top = self._top
 
-            if self._stack.length:
-                self._top = self._stack.lookup(self._stack.length-1)
+            if self._stack._length:
+                self._top = self._stack.lookup(self._stack._length-1)
             else:
                 self._top = None
 

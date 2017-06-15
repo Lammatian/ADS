@@ -25,24 +25,24 @@ class DArray(object):
 		:param vals: optional initial values for the array
 		:type vals: T[]
 		"""
-		self.arr = array.Array(max(3*len(vals)//2, 2), vals)
-		self.length = len(vals)
-		self.max_length = max(3*len(vals)//2, 2)
+		self._arr = array.Array(max(3*len(vals)//2, 2), vals)
+		self._length = len(vals)
+		self._max_length = max(3*len(vals)//2, 2)
 
 
 	def __iter__(self):
 		"""Iterator"""
-		return iter(self.arr)
+		return iter(self._arr._vals[:self._length])
 
 
 	def __repr__(self):
 		"""Representation of the array"""
-		return "DArray(" + str(self.arr) + ")"
+		return super(DArray, self).__repr__()
 
 
 	def __str__(self):
 		"""Return str(self)"""
-		return str(self.arr)
+		return str(self._arr._vals[:self._length])
 
 
 	def lookup(self, n):
@@ -50,8 +50,14 @@ class DArray(object):
 		Get the n-th element of the array
 
 		Raises error if n out of bounds
+
+		:param n: index to be looked up
+		:type n: int
 		"""
-		return self.arr.lookup(n)
+		if n < self._length:
+			return self._arr.lookup(n)
+		else:
+			raise IndexError("index out of bounds")
 
 
 	def update(self, n, val):
@@ -59,8 +65,16 @@ class DArray(object):
 		Update n-th element of the array to given value
 
 		Raises error if n out of bounds
+
+		:param n: index in the array
+		:param val: value to insert
+		:type n: int
+		:type val: T
 		"""
-		self.arr.update(n, val)
+		if n < self._length:
+			self._arr.put(n, val)
+		else:
+			raise IndexError("index out of bounds")
 
 
 	def insert(self, n, val):
@@ -70,16 +84,20 @@ class DArray(object):
 		If the array is full, make a new array of size 3/2 of the old one
 
 		Raises error if n out of bounds of the array
-		"""
-		if n < self.length and n >= 0:
-			if self.length < self.max_length:
-				self.arr.insert(n, val)
-			else:
-				self.arr = array.Array(3*self.max_length//2, self.arr.vals)
-				self.max_length = 3*self.max_length//2
-				self.arr.insert(n, val)
 
-			self.length += 1
+		:param n: index in the array
+		:param val: value to insert
+		:type n: int
+		:type val: T
+		"""
+		if n < self._length and n >= 0:
+			if self._length < self._max_length:
+				self._arr = array.Array(self._max_length, self._arr._vals[:n] + [val] + self._arr._vals[n:self._length])
+			else:
+				self._arr = array.Array(3*self._max_length//2, self._arr._vals[:n] + [val] + self._arr._vals[n:self._length])
+				self._max_length = 3*self._max_length//2
+
+			self._length += 1
 		else:
 			raise IndexError("index out of bounds")
 
@@ -89,15 +107,17 @@ class DArray(object):
 		Insert value at the end of the array
 
 		If the array is full, make a new array of size 3/2 of the old one
-		"""
-		if self.length < self.max_length:
-			self.arr.insertLast(val)
-		else:
-			self.arr = array.Array(3*self.max_length//2, self.arr.vals)
-			self.max_length = 3*self.max_length//2
-			self.arr.insertLast(val)
 
-		self.length += 1
+		:param val: value to insert
+		:type val: T
+		"""
+		if self._length < self._max_length:
+			self._arr.put(self._length, val)
+		else:
+			self._arr = array.Array(3*self._max_length//2, self._arr._vals[:self._length] + [val])
+			self._max_length = 3*self._max_length//2
+
+		self._length += 1
 
 
 	def remove(self, n):
@@ -107,14 +127,18 @@ class DArray(object):
 		If load factor falls below 1/2, make a new array of size 3/4 of the old one
 
 		Raises error if n out of bounds of the array
-		"""
-		if n < self.length and n >= 0:
-			self.arr.remove(n)
-			self.length -= 1
 
-			if self.length/self.max_length < 0.5:
-				self.arr = array.Array(max(3*self.max_length//4, 2), self.arr.vals[:self.length])
-				self.max_length = max(3*self.max_length//4, 2)
+		:param n: index in the array
+		:type n: int
+		"""
+		if n < self._length and n >= 0:
+			if (self._length-1)/self._max_length >= 0.5:
+				self._arr = array.Array(self._max_length, self._arr._vals[:n] + self._arr._vals[n+1:self._length])
+			else:
+				self._arr = array.Array(max(3*self._max_length//4, 2), self._arr._vals[:n] + self._arr._vals[n+1:self._length])
+				self._max_length = max(3*self._max_length//4, 2)
+
+			self._length -= 1
 		else:
 			raise IndexError("index out of bounds")
 
@@ -125,13 +149,15 @@ class DArray(object):
 
 		If load factor falls below 1/2, make a new array of size 3/4 of the old one
 		"""
-		self.arr.removeLast()
-		if self.length:
-			self.length -= 1
 
-		if self.length/self.max_length < 0.5:
-			self.arr = array.Array(max(3*self.max_length//4, 2), self.arr.vals[:self.length])
-			self.max_length = max(3*self.max_length//4, 2)
+		if (self._length-1)/self._max_length >= 0.5:
+			self._arr = array.Array(self._max_length, self._arr._vals[:self._length-1])
+		else:
+			self._arr = array.Array(max(3*self._max_length//4, 2), self._arr._vals[:self._length-1])
+			self._max_length = max(3*self._max_length//4, 2)
+
+		if self._length > 0:
+			self._length -= 1
 
 
 	def find(self, n):
@@ -139,5 +165,8 @@ class DArray(object):
 		Returns an index of the first occurence of n in the array
 
 		If value is not found, returns -1
+
+		:param n: index in the array:
+		:type n: int
 		"""
-		return self.arr.find(n)
+		return self._arr.find(n)
