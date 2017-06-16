@@ -1,5 +1,3 @@
-import inspect # for getting the functions
-
 class Array(object):
 	"""
 	Implementation of an array using Python list

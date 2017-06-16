@@ -12,7 +12,6 @@ class ArgDialog(tkSimpleDialog.Dialog):
 
 		for i in range(len(self.args)):
 			self.entries[i] = Entry(master)
-		print(self.entries)
 
 		for i, entry in enumerate(self.entries):
 			entry.grid(row=i, column=1)
@@ -21,5 +20,6 @@ class ArgDialog(tkSimpleDialog.Dialog):
 
 
 	def apply(self):
+		# TODO - change to do right thing preferably
 		first = int(self.entries[0].get())
-		print(first)
+		self.result = first

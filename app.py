@@ -135,7 +135,8 @@ class App(object):
         """
         if self._get_arguments(what.__init__):
             argDial = argDialog.ArgDialog(self.master, self._get_arguments(what.__init__), "Initialisation")
-        print(self._get_arguments(what.__init__))
+            
+        print(argDial.result)
 
 
 
