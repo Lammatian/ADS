@@ -1,5 +1,7 @@
 class DLinkedList(object):
 	"""Implementation of doubly linked list with standard methods"""
+	_title = "Doubly linked list"
+
 	class Node(object):
 		"""Single node of the doubly linked list with a value"""
 		def __init__(self, val):

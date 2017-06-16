@@ -9,6 +9,8 @@ class Queue(object):
 
 	Includes basic operations such as isEmpty, enqueue, dequeue, peek
 	"""
+	_title = "Queue"
+
 	def __init__(self):
 		"""Initialise an empty queue"""
 		self._queue = DLinkedList()

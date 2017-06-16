@@ -10,6 +10,8 @@ class Stack(object):
     This implementation includes basic operations such as
     peek, pop, push and isEmpty
     """
+    _title = "Stack"
+
     def __init__(self):
         """Initialise an empty stack"""
         self._stack = dynamicarray.DArray([])

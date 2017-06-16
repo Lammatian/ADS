@@ -1,5 +1,7 @@
 class LinkedList(object):
 	"""Implementation of linked list with standard methods"""
+	_title = "Linked list"
+
 	class Node(object):
 		"""Single node of the linked list with a value"""
 		def __init__(self, val):

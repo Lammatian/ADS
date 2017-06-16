@@ -12,6 +12,8 @@ class DArray(object):
 
 	This implementation uses growth factor of 1.5
 	"""
+	_title = "Dynamic array"
+
 	def __init__(self, vals=[]):
 		"""
 		Initialise the array with optional initial values

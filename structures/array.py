@@ -7,6 +7,7 @@ class Array(object):
 
 	In this version, array is of bounded length to imitate static array structure
 	"""
+	_title = "Array"
 
 	def __init__(self, length, vals=[]):
 		"""
