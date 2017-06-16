@@ -4,6 +4,7 @@ from functools import partial # to be able to pass arguments to buttons/menus
 import inspect # to get functions in a class
 from types import FunctionType
 import argDialog
+import ast # to pass proper arguments
 
 from structures import *
 
@@ -25,7 +26,7 @@ class App(object):
         # top-left corner title
         self.titleBorder = tk.Frame(master, highlightthickness=titleBorderWidth, highlightbackground="dim grey", highlightcolor="dim grey")
         self.titleBorder.place(x=-titleBorderWidth, y=-titleBorderWidth)
-        self.title = tk.Label(self.titleBorder, text=title, font=("OratorStd", 20))
+        self.title = tk.Label(self.titleBorder, text=title, font=("OratorStd", 20), bg="white")
         self.title.pack(side="top", anchor="w")
 
         # bottom operation menu border
@@ -34,13 +35,13 @@ class App(object):
         self.opBorder.pack_propagate(0)
 
         # bottom operation menu
-        self.opMenu = tk.Frame(self.opBorder, height=98)
+        self.opMenu = tk.Frame(self.opBorder, height=98, bg="white")
         self.opMenu.pack(fill="both", expand=1, pady=(2,0))
         self.opMenu.pack_propagate(0)
         self.opMenu.grid_columnconfigure(0, weight=1)
 
         # bottom Operation text
-        self.opText = tk.Label(self.opMenu, text="Operation:", font=("OratorStd", 18))
+        self.opText = tk.Label(self.opMenu, text="Operation:", font=("OratorStd", 18), bg="white")
         self.opText.grid(column=0, row=0, sticky="W", pady=(10,0), padx=(20,0))
 
         # bottom Operations menu
@@ -53,7 +54,7 @@ class App(object):
         self.rew = tk.Button(self.opMenu, image=rewImg)
         self.rew.grid(column=1, row=0, rowspan=2, pady=(10,0), padx=(0,20))
 
-        self.play = tk.Button(self.opMenu, image=playImg)
+        self.play = tk.Button(self.opMenu, image=playImg, command=self._perform)
         self.play.grid(column=2, row=0, rowspan=2, pady=(10,0), padx=(0,20))
 
         self.step = tk.Button(self.opMenu, image=stepImg)
@@ -93,10 +94,14 @@ class App(object):
         self.menubar.add_command(label="Exit", command=self.master.quit)
 
         self.master.config(menu=self.menubar)
+        self.master.bind("<Return>", self._perform)
+        # TODO - add key arrow choice of operations
+
 
 
     def _load(self, what):
         """Loads appropriate data structure or algorithm"""
+        self.title.config(text=what._title)
         print("Loading", what)
         if what:
             self._update_ops(what)
@@ -120,9 +125,9 @@ class App(object):
         self.default.set("Choose operation")
         self.operations['menu'].delete(0, 'end')
 
-        public_functions = dict([fun for fun in self._get_functions(what) if not fun[0].startswith('_')])
+        self.public_functions = dict([fun for fun in self._get_functions(what) if not fun[0].startswith('_')])
 
-        for op in public_functions.keys():
+        for op in self.public_functions.keys():
             self.operations['menu'].add_command(label=op, command=tk._setit(self.default, op))
 
         self._initialise_ds(what)
@@ -135,8 +140,31 @@ class App(object):
         """
         if self._get_arguments(what.__init__):
             argDial = argDialog.ArgDialog(self.master, self._get_arguments(what.__init__), "Initialisation")
-            
-        print(argDial.result)
+            self.ds = what(*[ast.literal_eval(r) for r in argDial.result])
+        else:
+            self.ds = what()
+
+        print(self.ds)
+
+
+    def _perform(self, event):
+        """
+        Perform given function
+
+        May ask for additional parameters
+        if the function has arguments
+        """
+        # get the function to be performed from the list of public functions
+        # which was initialised in _update_ops
+        function = self.public_functions[self.default.get()]
+
+        if self._get_arguments(function):
+            argDial = argDialog.ArgDialog(self.master, self._get_arguments(function), "Initialisation")
+            print(function(self.ds, *[ast.literal_eval(r) for r in argDial.result]))
+        else:
+            print(function(self.ds))
+
+        print(self.ds)
 
 
 

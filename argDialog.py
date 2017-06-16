@@ -21,5 +21,4 @@ class ArgDialog(tkSimpleDialog.Dialog):
 
 	def apply(self):
 		# TODO - change to do right thing preferably
-		first = int(self.entries[0].get())
-		self.result = first
+		self.result = [s.get() for s in self.entries]
