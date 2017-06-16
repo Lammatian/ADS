@@ -1,6 +1,9 @@
 import tkinter as tk
 from PIL import ImageTk, Image
 from functools import partial # to be able to pass arguments to buttons/menus
+import inspect # to get functions in a class
+from types import FunctionType
+import argDialog
 
 from structures import *
 
@@ -70,8 +73,12 @@ class App(object):
 
         # data structures menu
         self.dsmenu = tk.Menu(self.loadmenu, tearoff=0)
-        self.dsmenu.add_command(label="Array", command=partial(self._load, "Array"))
-        self.dsmenu.add_command(label="Dynamic array", command=partial(self._load, "DArray"))
+        self.dsmenu.add_command(label="Array", command=partial(self._load, Array))
+        self.dsmenu.add_command(label="Dynamic array", command=partial(self._load, DArray))
+        self.dsmenu.add_command(label="Linked list", command=partial(self._load, LinkedList))
+        self.dsmenu.add_command(label="Doubly linked list", command=partial(self._load, DLinkedList))
+        self.dsmenu.add_command(label="Stack", command=partial(self._load, Stack))
+        self.dsmenu.add_command(label="Queue", command=partial(self._load, Queue))
 
         # algorithms menu
         self.algmenu = tk.Menu(self.loadmenu, tearoff=0)
@@ -91,19 +98,45 @@ class App(object):
     def _load(self, what):
         """Loads appropriate data structure or algorithm"""
         print("Loading", what)
-        self._update_ops(what)
+        if what:
+            self._update_ops(what)
+
+
+    def _get_functions(self, what):
+        """Gets the list of functions in the given class"""
+        return [m for m in inspect.getmembers(what) if type(m[1]) == FunctionType]
+
+
+    def _get_arguments(self, function):
+        """Gets the arguments of a given function"""
+        return function.__code__.co_varnames[1:function.__code__.co_argcount]
+
 
     def _update_ops(self, what):
         """
         Updates operation menu to show operations available for
         given data structure (if data structure is chosen)
         """
-        self.default.set(Array._ops[0])
+        self.default.set("Choose operation")
         self.operations['menu'].delete(0, 'end')
 
-        new_choices = Array._ops
-        for choice in new_choices:
-            self.operations['menu'].add_command(label=choice, command=tk._setit(self.default, choice))
+        public_functions = dict([fun for fun in self._get_functions(what) if not fun[0].startswith('_')])
+
+        for op in public_functions.keys():
+            self.operations['menu'].add_command(label=op, command=tk._setit(self.default, op))
+
+        self._initialise_ds(what)
+
+
+    def _initialise_ds(self, what):
+        """
+        Initialise a data structure inside a dialog window
+        where all the arguments can be given
+        """
+        if self._get_arguments(what.__init__):
+            argDial = argDialog.ArgDialog(self.master, self._get_arguments(what.__init__), "Initialisation")
+        print(self._get_arguments(what.__init__))
+
 
 
 root = tk.Tk()

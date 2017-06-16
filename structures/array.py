@@ -1,3 +1,5 @@
+import inspect # for getting the functions
+
 class Array(object):
 	"""
 	Implementation of an array using Python list
@@ -7,7 +9,6 @@ class Array(object):
 
 	In this version, array is of bounded length to imitate static array structure
 	"""
-	_ops = ["Lookup", "Put", "Find"]
 
 	def __init__(self, length, vals=[]):
 		"""
