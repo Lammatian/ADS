@@ -212,7 +212,11 @@ class DLinkedList(object):
 		"""Remove the last node of the list if it exists"""
 		if self.tail:
 			self.tail = self.tail.prev
-			self.tail.next = None
+			if self.tail:
+				self.tail.next = None
+			else:
+				self.head = self.tail = None
+				
 			self.length -= 1
 
 
@@ -244,3 +248,23 @@ class DLinkedList(object):
 				self.head = self.head.next
 
 			self.head = dummy
+
+
+	def _show(self, canvas):
+		"""Show the linked list in canvas"""
+		# function for drawing an arrow
+		def draw_arrows(start_x, start_y):
+			canvas.create_line((start_x, start_y+10), (start_x+50, start_y+10))
+			canvas.create_line((start_x, start_y-10), (start_x+50, start_y-10))
+			canvas.create_polygon((start_x+37, start_y+15), (start_x+50, start_y+10), (start_x+37, start_y+5))
+			canvas.create_polygon((start_x, start_y-10), (start_x+13, start_y-5), (start_x+13, start_y-15))
+
+		for i, node in enumerate(self):
+			# node
+			canvas.create_rectangle(100*i+50, canvas.winfo_reqheight()//2-25, 100*i+100, canvas.winfo_reqheight()//2+25, fill="white")
+			# value in the node
+			canvas.create_text(100*i+75, canvas.winfo_reqheight()//2, text=str(node.val))
+
+			if i < self.length-1:
+				# arrow between nodes
+				draw_arrows(100*i+100, canvas.winfo_reqheight()//2)

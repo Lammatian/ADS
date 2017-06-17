@@ -172,3 +172,10 @@ class DArray(object):
 		:type n: int
 		"""
 		return self._arr.find(n)
+
+
+	def _show(self, canvas):
+		"""Show the dynamic array in the canvas"""
+		for i, val in enumerate(self._arr._vals[:self._length]):
+			canvas.create_rectangle(50*i+50, canvas.winfo_reqheight()//2-25, 50*i+100, canvas.winfo_reqheight()//2+25, fill="white")
+			canvas.create_text((50*i+75, canvas.winfo_reqheight()//2), text=str(val))
