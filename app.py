@@ -5,6 +5,7 @@ import inspect # to get functions in a class
 from types import FunctionType
 import argDialog
 import ast # to pass proper arguments
+from resizingCanvas import ResizingCanvas
 
 from structures import *
 
@@ -46,8 +47,8 @@ class App(object):
 
         # bottom Operations menu
         self.default = tk.StringVar(self.opMenu)
-        self.default.set("Op 1")
-        self.operations = tk.OptionMenu(self.opMenu, self.default, "Op 1", "Op 2", "Op 3")
+        self.default.set("Op1")
+        self.operations = tk.OptionMenu(self.opMenu, self.default, "Op1", "Op2", "Op3")
         self.operations.grid(column=0, row=1, sticky="W", padx=(20,0))
 
         # bottom buttons
@@ -95,8 +96,19 @@ class App(object):
 
         self.master.config(menu=self.menubar)
         self.master.bind("<Return>", self._perform)
-        # TODO - add key arrow choice of operations
+        
+        # for arrow key scrolling through operations
+        self.operation_options = ["Op1", "Op2", "Op3"]
+        self.current_op = 0
+        self.master.bind("<Down>", self._down_scroll)
+        self.master.bind("<Up>", self._up_scroll)
 
+        # fast exiting
+        self.master.bind("<Key-q>", lambda event: self.master.quit())
+
+        # canvas for presenting data structures
+        self.canvas = tk.Canvas(master)
+        self.canvas.pack(pady=(50,100), fill=tk.BOTH, expand=True)        
 
 
     def _load(self, what):
@@ -122,12 +134,13 @@ class App(object):
         Updates operation menu to show operations available for
         given data structure (if data structure is chosen)
         """
-        self.default.set("Choose operation")
         self.operations['menu'].delete(0, 'end')
 
         self.public_functions = dict([fun for fun in self._get_functions(what) if not fun[0].startswith('_')])
+        self.operation_options = list(self.public_functions.keys())
+        self.default.set(self.operation_options[0])
 
-        for op in self.public_functions.keys():
+        for op in self.operation_options:
             self.operations['menu'].add_command(label=op, command=tk._setit(self.default, op))
 
         self._initialise_ds(what)
@@ -144,10 +157,11 @@ class App(object):
         else:
             self.ds = what()
 
-        print(self.ds)
+        self.canvas.delete(tk.ALL)
+        self.ds._show(self.canvas)
 
 
-    def _perform(self, event):
+    def _perform(self, event=None):
         """
         Perform given function
 
@@ -159,13 +173,25 @@ class App(object):
         function = self.public_functions[self.default.get()]
 
         if self._get_arguments(function):
-            argDial = argDialog.ArgDialog(self.master, self._get_arguments(function), "Initialisation")
+            argDial = argDialog.ArgDialog(self.master, self._get_arguments(function), "Give parameters")
             print(function(self.ds, *[ast.literal_eval(r) for r in argDial.result]))
         else:
             print(function(self.ds))
 
-        print(self.ds)
+        self.canvas.delete(tk.ALL)
+        self.ds._show(self.canvas)
 
+
+    def _down_scroll(self, event):
+        """Scroll down the option menu"""
+        self.current_op = (self.current_op + 1)%len(self.operation_options)
+        self.default.set(self.operation_options[self.current_op])
+
+
+    def _up_scroll(self, event):
+        """Scroll up the option menu"""
+        self.current_op = (self.current_op - 1)%len(self.operation_options)
+        self.default.set(self.operation_options[self.current_op])
 
 
 root = tk.Tk()

@@ -36,7 +36,7 @@ class Dialog(Toplevel):
 		self.protocol("WM_DELETE_WINDOW", self.cancel)
 
 		# set dialogue to be in the middle of the app
-		self.geometry("+{}+{}".format(parent.winfo_rootx()+50, parent.winfo_rooty()+50))
+		self.geometry("+{}+{}".format(parent.winfo_rootx()+parent.winfo_width()//3, parent.winfo_rooty()+parent.winfo_height()//2))
 
 		# set focus of keyboard to dialogue
 		self.initial_focus.focus_set()
@@ -47,15 +47,13 @@ class Dialog(Toplevel):
 
 	def body(self, master):
 		# create a dialog body. return widged that should have
-		# initial focus. this method should be overwritte
-
+		# initial focus. this method should be overwritten
 		pass
 
 
 	def buttonbox(self):
 		# add standard button box. override if you don't want the
 		# standard buttons
-
 		box = Frame(self)
 
 		w = Button(box, text="OK", width=10, command=self.ok, default=ACTIVE)
@@ -70,7 +68,7 @@ class Dialog(Toplevel):
 
 
 	def ok(self, event=None):
-
+		"""On clicking ok button or pressing enter accept changes"""
 		if not self.validate():
 			self.initial_focus.focus_set()
 			return
