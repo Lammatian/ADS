@@ -91,10 +91,3 @@ class Array(object):
 			return self._vals.index(val)
 		except ValueError:
 			return -1
-
-
-	def _show(self, canvas):
-		"""Show the array in the canvas"""
-		for i, val in enumerate(self._vals):
-			canvas.create_rectangle(50*i+50, canvas.winfo_reqheight()//2-25, 50*i+100, canvas.winfo_reqheight()//2+25, fill="white")
-			canvas.create_text((50*i+75, canvas.winfo_reqheight()//2), text=str(val))

@@ -2,12 +2,13 @@ import tkinter as tk
 from PIL import ImageTk, Image
 from functools import partial # to be able to pass arguments to buttons/menus
 import inspect # to get functions in a class
+import sys
 from types import FunctionType
 import argDialog
 import ast # to pass proper arguments
 from resizingCanvas import ResizingCanvas
 
-from structures import *
+from animated import *
 
 widthpixels = 700
 heightpixels = 500
@@ -75,12 +76,14 @@ class App(object):
 
         # data structures menu
         self.dsmenu = tk.Menu(self.loadmenu, tearoff=0)
-        self.dsmenu.add_command(label="Array", command=partial(self._load, Array))
-        self.dsmenu.add_command(label="Dynamic array", command=partial(self._load, DArray))
-        self.dsmenu.add_command(label="Linked list", command=partial(self._load, LinkedList))
-        self.dsmenu.add_command(label="Doubly linked list", command=partial(self._load, DLinkedList))
-        self.dsmenu.add_command(label="Stack", command=partial(self._load, Stack))
-        self.dsmenu.add_command(label="Queue", command=partial(self._load, Queue))
+        # automated adding new structures as they are implemented
+        # get all classes loaded at the moment
+        classes = inspect.getmembers(sys.modules[__name__], inspect.isclass)
+        # get all classes that are in animated package
+        structs = [(name, cls) for name, cls in classes if 'animated' in str(cls)]
+        # add commands in menu for each class of the above
+        for name, cls in structs:
+            self.dsmenu.add_command(label=cls._title, command=partial(self._load, cls))
 
         # algorithms menu
         self.algmenu = tk.Menu(self.loadmenu, tearoff=0)
@@ -119,16 +122,6 @@ class App(object):
             self._update_ops(what)
 
 
-    def _get_functions(self, what):
-        """Gets the list of functions in the given class"""
-        return [m for m in inspect.getmembers(what) if type(m[1]) == FunctionType]
-
-
-    def _get_arguments(self, function):
-        """Gets the arguments of a given function"""
-        return function.__code__.co_varnames[1:function.__code__.co_argcount]
-
-
     def _update_ops(self, what):
         """
         Updates operation menu to show operations available for
@@ -151,14 +144,14 @@ class App(object):
         Initialise a data structure inside a dialog window
         where all the arguments can be given
         """
+        self.canvas.delete(tk.ALL)
+
         if self._get_arguments(what.__init__):
             argDial = argDialog.ArgDialog(self.master, self._get_arguments(what.__init__), "Initialisation")
-            self.ds = what(*[ast.literal_eval(r) for r in argDial.result])
+            # initialise the data structure
+            self.ds = what(self.canvas, *[ast.literal_eval(r) for r in argDial.result])
         else:
             self.ds = what()
-
-        self.canvas.delete(tk.ALL)
-        self.ds._show(self.canvas)
 
 
     def _perform(self, event=None):
@@ -178,8 +171,19 @@ class App(object):
         else:
             print(function(self.ds))
 
-        self.canvas.delete(tk.ALL)
-        self.ds._show(self.canvas)
+
+    def _get_functions(self, what):
+        """Gets the list of functions in the given class"""
+        return [m for m in inspect.getmembers(what) if type(m[1]) == FunctionType]
+
+
+    def _get_arguments(self, function):
+        """Gets the arguments of a given function"""
+        if function.__name__ == "__init__":
+            # to omit canvas in initialisation
+            return function.__code__.co_varnames[2:function.__code__.co_argcount]
+        else:
+            return function.__code__.co_varnames[1:function.__code__.co_argcount]
 
 
     def _down_scroll(self, event):
