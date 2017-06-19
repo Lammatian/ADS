@@ -56,7 +56,7 @@ class DArray(object):
 		:param n: index to be looked up
 		:type n: int
 		"""
-		if n < self._length:
+		if n >= 0 and n < self._length:
 			return self._arr.lookup(n)
 		else:
 			raise IndexError("index out of bounds")
@@ -73,7 +73,7 @@ class DArray(object):
 		:type n: int
 		:type val: T
 		"""
-		if n < self._length:
+		if n >= 0 and n < self._length:
 			self._arr.put(n, val)
 		else:
 			raise IndexError("index out of bounds")
