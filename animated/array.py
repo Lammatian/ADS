@@ -1,4 +1,4 @@
-class CArray(object):
+class Array(object):
 	"""
 	Implementation of an array using Python list
 
@@ -54,18 +54,18 @@ class CArray(object):
 		return str(self._vals)
 
 
-	def lookup(self, n):
+	def lookup(self, index):
 		"""
 		Get n-th element of the array
 
-		Raises error if n out of bounds of the array
+		Raises error if index out of bounds of the array
 
-		:param n: index in the array
-		:type n: int
+		:param index: index in the array
+		:type index: int
 		"""
-		if n < self._max_length and n >= 0:
-			self._lookup_animation(n, 0)
-			return self._vals[n]
+		if index < self._max_length and index >= 0:
+			self._lookup_animation(index, 0)
+			return self._vals[index]
 		else:
 			raise IndexError("index out of bounds")
 
@@ -107,7 +107,7 @@ class CArray(object):
 
 
 	def _lookup_animation(self, n, step):
-		"""animation of lookup operation"""
+		"""Animation of lookup operation"""
 		if step == 0:
 			# highlight the entry looked up
 			self.canvas.itemconfig(self.graphic[n][0], fill="green")
@@ -119,7 +119,7 @@ class CArray(object):
 
 
 	def _put_animation(self, n, val, step):
-		"""animation of put operation"""
+		"""Animation of put operation"""
 		if step == 0:
 			# highlight the entry to be changed
 			self.canvas.itemconfig(self.graphic[n][0], fill="green")
@@ -135,18 +135,18 @@ class CArray(object):
 
 
 	def _find_animation(self, val, step, n):
-		"""animation of find operation"""
-		if n == self._max_length-1 and step != 3:
-			# value not found, alert with red entry
-			self.canvas.itemconfig(self.graphic[n][0], fill="red")
-			self.canvas.after(500, self._find_animation, val, 3, n)
-		elif step == 0:
-			# highlight current entry blue and check if found value
-			self.canvas.itemconfig(self.graphic[n][0], fill="blue")
+		"""Animation of find operation"""
+		if step == 0:
+			# highlight current entry yellow and check if found value
+			self.canvas.itemconfig(self.graphic[n][0], fill="yellow")
 			if self._vals[n] == val:
 				self.canvas.after(250, self._find_animation, val, 2, n)
 			else:
 				self.canvas.after(500, self._find_animation, val, 1, n)
+		elif n == self._max_length-1 and step < 2:
+			# value not found, alert with red entry
+			self.canvas.itemconfig(self.graphic[n][0], fill="red")
+			self.canvas.after(500, self._find_animation, val, 3, n)
 		elif step == 1:
 			# value not found, move to next entry
 			self.canvas.itemconfig(self.graphic[n][0], fill="white")
