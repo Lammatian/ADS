@@ -130,7 +130,7 @@ class App(object):
         self.operations['menu'].delete(0, 'end')
 
         self.public_functions = dict([fun for fun in self._get_functions(what) if not fun[0].startswith('_')])
-        self.operation_options = list(self.public_functions.keys())
+        self.operation_options = sorted(list(self.public_functions.keys()))
         self.default.set(self.operation_options[0])
 
         for op in self.operation_options:

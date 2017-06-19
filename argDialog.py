@@ -6,7 +6,7 @@ class ArgDialog(tkSimpleDialog.Dialog):
 	def body(self, master):
 		"""Body of the dialog with entries for all arguments"""
 		for i, arg in enumerate(self.args):
-			Label(master, text=arg).grid(row=i)
+			Label(master, text=(arg + " ")).grid(row=i)
 
 		self.entries = [None]*len(self.args)
 
