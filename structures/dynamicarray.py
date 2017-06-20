@@ -10,7 +10,7 @@ class DArray(object):
 	The above is used instead of Pythons lists (which are dynamic arrays themselves)
 	to show how dynamic arrays work under the hood
 
-	This implementation uses growth factor of 1.5
+	This implementation uses growth factor of 2
 	"""
 	_title = "Dynamic array"
 
@@ -19,7 +19,7 @@ class DArray(object):
 		Initialise the array with optional initial values
 
 		According to the growth factor, the initial length of the array 
-		will be equal to 1.5 of the length of the argument
+		will be equal to 2 times the length of the argument
 
 		If no initial values are given or just one value is given
 		initial length will be equal to 2
@@ -27,9 +27,9 @@ class DArray(object):
 		:param vals: optional initial values for the array
 		:type vals: T[]
 		"""
-		self._arr = array.Array(max(3*len(vals)//2, 2), vals)
+		self._arr = array.Array(max(4*len(vals)//3, 2), vals)
 		self._length = len(vals)
-		self._max_length = max(3*len(vals)//2, 2)
+		self._max_length = max(4*len(vals)//3, 2)
 
 
 	def __iter__(self):
@@ -83,7 +83,8 @@ class DArray(object):
 		"""
 		Insert value at the n-th position of the array
 
-		If the array is full, make a new array of size 3/2 of the old one
+		If the array is full, make a new array of
+		twice the size of the old one
 
 		Raises error if n out of bounds of the array
 
@@ -96,8 +97,8 @@ class DArray(object):
 			if self._length < self._max_length:
 				self._arr = array.Array(self._max_length, self._arr._vals[:n] + [val] + self._arr._vals[n:self._length])
 			else:
-				self._arr = array.Array(3*self._max_length//2, self._arr._vals[:n] + [val] + self._arr._vals[n:self._length])
-				self._max_length = 3*self._max_length//2
+				self._arr = array.Array(2*self._max_length, self._arr._vals[:n] + [val] + self._arr._vals[n:self._length])
+				self._max_length = 2*self._max_length
 
 			self._length += 1
 		else:
@@ -108,7 +109,8 @@ class DArray(object):
 		"""
 		Insert value at the end of the array
 
-		If the array is full, make a new array of size 3/2 of the old one
+		If the array is full, make a new array of
+		twice the size of the old one
 
 		:param val: value to insert
 		:type val: T
@@ -116,8 +118,8 @@ class DArray(object):
 		if self._length < self._max_length:
 			self._arr.put(self._length, val)
 		else:
-			self._arr = array.Array(3*self._max_length//2, self._arr._vals[:self._length] + [val])
-			self._max_length = 3*self._max_length//2
+			self._arr = array.Array(2*self._max_length, self._arr._vals[:self._length] + [val])
+			self._max_length = 2*self._max_length
 
 		self._length += 1
 
@@ -172,10 +174,3 @@ class DArray(object):
 		:type n: int
 		"""
 		return self._arr.find(n)
-
-
-	def _show(self, canvas):
-		"""Show the dynamic array in the canvas"""
-		for i, val in enumerate(self._arr._vals[:self._length]):
-			canvas.create_rectangle(50*i+50, canvas.winfo_reqheight()//2-25, 50*i+100, canvas.winfo_reqheight()//2+25, fill="white")
-			canvas.create_text((50*i+75, canvas.winfo_reqheight()//2), text=str(val))

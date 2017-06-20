@@ -8,7 +8,7 @@ import argDialog
 import ast # to pass proper arguments
 from resizingCanvas import ResizingCanvas
 
-from animated import *
+from structures import *
 
 widthpixels = 700
 heightpixels = 500
@@ -80,7 +80,7 @@ class App(object):
         # get all classes loaded at the moment
         classes = inspect.getmembers(sys.modules[__name__], inspect.isclass)
         # get all classes that are in animated package
-        structs = [(name, cls) for name, cls in classes if 'animated' in str(cls)]
+        structs = [(name, cls) for name, cls in classes if 'anim' in str(cls)]
         # add commands in menu for each class of the above
         for name, cls in structs:
             self.dsmenu.add_command(label=cls._title, command=partial(self._load, cls))
@@ -111,7 +111,7 @@ class App(object):
 
         # canvas for presenting data structures
         self.canvas = tk.Canvas(master)
-        self.canvas.pack(pady=(50,100), fill=tk.BOTH, expand=True)        
+        self.canvas.pack(pady=(50,0), fill=tk.BOTH, expand=True)        
 
 
     def _load(self, what):
