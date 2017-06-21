@@ -19,7 +19,8 @@ opBorderWidth = 2
 # Animation classes available for the user to pick from in the `load` -> `data structures` menu item.
 AVAILABLE_ANIMATIONS = [
     A_Array,
-    A_DArray
+    A_DArray,
+    A_Stack
 ]
 
 
@@ -154,7 +155,7 @@ class App(object):
             # initialise the data structure
             self.ds = what(self.canvas, *[ast.literal_eval(r) for r in argDial.result])
         else:
-            self.ds = what()
+            self.ds = what(self.canvas)
 
 
     def _perform(self, event=None):

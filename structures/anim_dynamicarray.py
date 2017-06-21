@@ -9,7 +9,7 @@ class A_DArray(DArray):
     """
     Animated dynamic array as an extension to the dynamic array
 
-    qEach operation has its own animation
+    Each operation has its own animation
     """
 
     def __init__(self, canvas, values=[]):
