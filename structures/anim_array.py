@@ -124,3 +124,9 @@ class A_Array(Array):
             # clean up and finish
             self.canvas.itemconfig(self.graphic[n][0], fill="white")
             return
+
+    animations = [
+        lookup,
+        put,
+        find
+    ]

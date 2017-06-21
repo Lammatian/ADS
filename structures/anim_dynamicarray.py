@@ -10,6 +10,7 @@ class A_DArray(DArray):
 
     Each operation has its own animation
     """
+
     def __init__(self, canvas, values=[]):
         """
         Initialise the array with optional initial values
@@ -302,3 +303,14 @@ class A_DArray(DArray):
             # clean up and finish
             self.canvas.itemconfig(self.graphic[n][0], fill="white")
             return
+
+
+    animations = [
+        lookup,
+        update,
+        insert,
+        insertLast,
+        remove,
+        removeLast,
+        find
+    ]

@@ -15,6 +15,14 @@ heightpixels = 500
 titleBorderWidth = 2
 opBorderWidth = 2
 
+
+# Animation classes available for the user to pick from in the `load` -> `data structures` menu item.
+AVAILABLE_ANIMATIONS = [
+    A_Array,
+    A_DArray
+]
+
+
 class App(object):
     """Interface for the program"""
     def __init__(self, master, title='ADS Helptool'):
@@ -76,14 +84,9 @@ class App(object):
 
         # data structures menu
         self.dsmenu = tk.Menu(self.loadmenu, tearoff=0)
-        # automated adding new structures as they are implemented
-        # get all classes loaded at the moment
-        classes = inspect.getmembers(sys.modules[__name__], inspect.isclass)
-        # get all classes that are in animated package
-        structs = [(name, cls) for name, cls in classes if 'anim' in str(cls)]
-        # add commands in menu for each class of the above
-        for name, cls in structs:
-            self.dsmenu.add_command(label=cls._title, command=partial(self._load, cls))
+
+        for animation_class in AVAILABLE_ANIMATIONS:
+            self.dsmenu.add_command(label=animation_class._title, command=partial(self._load, animation_class))
 
         # algorithms menu
         self.algmenu = tk.Menu(self.loadmenu, tearoff=0)
@@ -99,7 +102,7 @@ class App(object):
 
         self.master.config(menu=self.menubar)
         self.master.bind("<Return>", self._perform)
-        
+
         # for arrow key scrolling through operations
         self.operation_options = ["Op1", "Op2", "Op3"]
         self.current_op = 0
@@ -111,7 +114,7 @@ class App(object):
 
         # canvas for presenting data structures
         self.canvas = tk.Canvas(master)
-        self.canvas.pack(pady=(50,0), fill=tk.BOTH, expand=True)        
+        self.canvas.pack(pady=(50,0), fill=tk.BOTH, expand=True)
 
 
     def _load(self, what):
@@ -129,7 +132,7 @@ class App(object):
         """
         self.operations['menu'].delete(0, 'end')
 
-        self.public_functions = dict([fun for fun in self._get_functions(what) if not fun[0].startswith('_')])
+        self.public_functions = {func.__name__: func for func in what.animations}
         self.operation_options = sorted(list(self.public_functions.keys()))
         self.default.set(self.operation_options[0])
 
@@ -170,11 +173,6 @@ class App(object):
             print(function(self.ds, *[ast.literal_eval(r) for r in argDial.result]))
         else:
             print(function(self.ds))
-
-
-    def _get_functions(self, what):
-        """Gets the list of functions in the given class"""
-        return [m for m in inspect.getmembers(what) if type(m[1]) == FunctionType]
 
 
     def _get_arguments(self, function):
