@@ -1,4 +1,5 @@
 import sys
+import math
 sys.path.append('../')
 
 from structures import array
@@ -8,7 +9,7 @@ class A_DArray(DArray):
     """
     Animated dynamic array as an extension to the dynamic array
 
-    Each operation has its own animation
+    qEach operation has its own animation
     """
 
     def __init__(self, canvas, values=[]):
@@ -75,30 +76,18 @@ class A_DArray(DArray):
         self._insertLast_animation(value)        
 
 
-    def remove(self, n):
+    def remove(self, index):
         """Call remove of DArray and animation"""
-        if n < self._length and n >= 0:
-            if (self._length-1)/self._max_length >= 0.5:
-                self._arr = array.Array(self._max_length, self._arr._vals[:n] + self._arr._vals[n+1:self._length])
-            else:
-                self._arr = array.Array(max(3*self._max_length//4, 2), self._arr._vals[:n] + self._arr._vals[n+1:self._length])
-                self._max_length = max(3*self._max_length//4, 2)
-
-            self._length -= 1
-        else:
-            raise IndexError("index out of bounds")
+        super(A_DArray, self).remove(index)
+        
+        self._remove_animation(index)
 
 
     def removeLast(self):
         """Call removeLast of DArray and animation"""
-        if (self._length-1)/self._max_length >= 0.5:
-            self._arr = array.Array(self._max_length, self._arr._vals[:self._length-1])
-        else:
-            self._arr = array.Array(max(3*self._max_length//4, 2), self._arr._vals[:self._length-1])
-            self._max_length = max(3*self._max_length//4, 2)
+        super(A_DArray, self).removeLast()
 
-        if self._length > 0:
-            self._length -= 1
+        self._removeLast_animation()
 
 
     def find(self, value):
@@ -125,7 +114,7 @@ class A_DArray(DArray):
 
     def _insert_animation(self, n, val):
         """Animation of the insert operation"""
-        if n < 0 or n >= self._length:
+        if n < 0 or n > self._length:
             return
 
         def notFull(val, n, step):
@@ -135,100 +124,111 @@ class A_DArray(DArray):
                 if current <= to:
                     self.canvas.after(150, notFull, val, n, 1)
                 elif step == 0:
-                    self.canvas.itemconfig(self.graphic[current-1][0], fill="green")
+                    self._swap_color(current-1, "green")
                     self.canvas.after(150, shift, to, 1, current)
                 elif step == 1:
-                    self.canvas.itemconfig(self.graphic[current-1][0], fill="white")
-                    self.canvas.itemconfig(self.graphic[current][0], fill="green")
+                    self._swap_color(current-1, "white")
+                    self._swap_color(current, "green")
                     self.canvas.itemconfig(self.graphic[current][1], text=str(self._arr._vals[current]))
                     self.canvas.after(150, shift, to, 2, current)
                 elif step == 2:
-                    self.canvas.itemconfig(self.graphic[current][0], fill="white")
+                    self._swap_color(current, "white")
                     self.canvas.after(150, shift, to, 0, current-1)
 
             if step == 0:
-                self.canvas.itemconfig(self.graphic[self._length-1][0], dash=(), fill="white")
+                self._swap_color(self._length-1, "white")
+                self._remove_dash(self._length-1)
                 shift(n, step, self._length-1)
             elif step == 1:
-                self.canvas.itemconfig(self.graphic[n][0], fill="green")
+                self._swap_color(n, "yellow")
                 self.canvas.after(250, notFull, val, n, 2)
             elif step == 2:
                 self.canvas.itemconfig(self.graphic[n][1], text=str(val))
                 self.canvas.after(250, notFull, val, n, 3)
             elif step == 3:
-                self.canvas.itemconfig(self.graphic[n][0], fill="white")
+                self._swap_color(n, "white")
                 return
+
 
         def full(val, n, step):
-            pass
-
-        # test whether the array is full 
-        # by checking if the last entry is dashed
-        if self.canvas.itemcget(self.graphic[-1][0], "dash") != "":
-            notFull(val, n, 0)
-        else:
-            full(val, n, 0)
-
-
-    def _insertLast_animation(self, val):
-        """Animation of the insertLast operation"""
-        def notFull(val, step):
-            # animation when array is not full
-            if step == 0:
-                self.canvas.itemconfig(self.graphic[self._length-1][0], dash=(), fill="green")
-                self.canvas.after(500, notFull, val, 1)
-            elif step == 1:
-                self.canvas.itemconfig(self.graphic[self._length-1][1], text=str(val))
-                self.canvas.after(500, notFull, val, 2)
-            elif step == 2:
-                self.canvas.itemconfig(self.graphic[self._length-1][0], fill="white")
-                return
-
-        def full(val, step):
             # animation when array is full
-            def fill(step, n):
-                # filling the new array
-                if n == self._length:
-                    self.canvas.after(500, full, val, 2)
-                elif step == 0:
-                    self.canvas.itemconfig(new_graphic[n][0], dash=(), fill="green")
-                    self.canvas.after(150, fill, 1, n)
-                elif step == 1:
-                    self.canvas.itemconfig(new_graphic[n][1], text=str(self._arr._vals[n]))
-                    self.canvas.after(150, fill, 2, n)
-                elif step == 2:
-                    self.canvas.itemconfig(new_graphic[n][0], fill="white")
-                    self.canvas.after(150, fill, 0, n+1)
+            def fill(which, step):
+                if which == self._length:
+                    # end filling
+                    self.canvas.after(500, full, val, n, 2)
+                elif which < n:
+                    # before insertion
+                    # just copy items from old array
+                    if step == 0:
+                        self._swap_color(which, "green")
+                        self._swap_color(which, "green", new_graphic)
+                        self._remove_dash(which, new_graphic)
+                        self.canvas.after(150, fill, which, 1)
+                    elif step == 1:
+                        self.canvas.itemconfig(new_graphic[which][1], text=str(self._arr._vals[which]))
+                        self.canvas.after(150, fill, which, 2)
+                    elif step == 2:
+                        self._swap_color(which, "white")
+                        self._swap_color(which, "white", new_graphic)
+                        self.canvas.after(150, fill, which+1, 0)
+                elif which == n:
+                    # insertion point
+                    # just modify new array
+                    if step == 0:
+                        self._swap_color(which, "yellow", new_graphic)
+                        self._remove_dash(which, new_graphic)
+                        self.canvas.after(150, fill, which, 1)
+                    elif step == 1:
+                        self.canvas.itemconfig(new_graphic[which][1], text=str(self._arr._vals[which]))
+                        self.canvas.after(150, fill, which, 2)
+                    elif step == 2:
+                        self._swap_color(which, "white", new_graphic)
+                        self.canvas.after(150, fill, which+1, 0)
+                elif which > n:
+                    # after insertion
+                    # there is an offset between the arrays now
+                    if step == 0:
+                        self._swap_color(which-1, "green")
+                        self._swap_color(which, "green", new_graphic)
+                        self._remove_dash(which, new_graphic)
+                        self.canvas.after(150, fill, which, 1)
+                    elif step == 1:
+                        self.canvas.itemconfig(new_graphic[which][1], text=str(self._arr._vals[which]))
+                        self.canvas.after(150, fill, which, 2)
+                    elif step == 2:
+                        self._swap_color(which-1, "white")
+                        self._swap_color(which, "white", new_graphic)
+                        self.canvas.after(150, fill, which+1, 0)
 
             if step == 0:
                 # create new array, initially all dashed
                 for i in range(self._max_length):
                     rect = self.canvas.create_rectangle(50*i+50,\
-                                                           self.canvas.winfo_reqheight()//2+75,\
-                                                           50*i+100,\
-                                                           self.canvas.winfo_reqheight()//2+125,\
-                                                           dash=(5,5), tag="new")
+                                                        self.canvas.winfo_reqheight()//2+75,\
+                                                        50*i+100,\
+                                                        self.canvas.winfo_reqheight()//2+125,\
+                                                        dash=(5,5), tag="new")
                     text = self.canvas.create_text((50*i+75,\
-                                                   self.canvas.winfo_reqheight()//2+100),\
-                                                   text="",\
-                                                   tag="new")
+                                                    self.canvas.winfo_reqheight()//2+100),\
+                                                    text="",\
+                                                    tag="new")
                     new_graphic.append((rect, text))
 
-                self.canvas.after(500, full, val, 1)
+                self.canvas.after(500, full, val, n, 1)
             elif step == 1:
-                # 'copy' all entries from old to new array
+                # 'copy' all the elements along with the new inserted one
                 fill(0, 0)
             elif step == 2:
-                # swap old array to new array
+                # move new array in place of the old one
                 self.canvas.delete("old")
                 self.canvas.move("new", 0, -100)
                 self.graphic = new_graphic
                 return
 
-        # test whether the array is full
+        # test whether the array is full 
         # by checking if the last entry is dashed
         if self.canvas.itemcget(self.graphic[-1][0], "dash") != "":
-            notFull(val, 0)
+            notFull(val, n, 0)
         else:
             # tag the old array as ' old'
             self.canvas.addtag_all("old")
@@ -236,27 +236,126 @@ class A_DArray(DArray):
             # for keeping the new array graphic
             new_graphic = []
 
-            full(val, 0)
+            full(val, n, 0)
 
 
-    def _removeNoResize_animation(self, n, step):
-        """Animation of removal if no resizing is needed"""
-        pass
+    def _insertLast_animation(self, val):
+        """Animation of the insertLast operation"""
+        self._insert_animation(self._length-1, val)
 
 
-    def _removeResize_animation(self, n, step):
-        """Animation of removal if resizing is needed"""
-        pass
+    def _remove_animation(self, n):
+        """Animation of remove operation"""
+        if n < 0 or n > self._length:
+            return
+
+        def noResize(current, step):
+            # animation when no resize is needed
+            if current == self._length:
+                self.canvas.itemconfig(self.graphic[current][0], dash=(5,5), fill="")
+                self.canvas.itemconfig(self.graphic[current][1], text="")
+                return
+            elif step == 0:
+                self._swap_color(current, "green")
+                self._swap_color(current+1, "green")
+                self.canvas.after(150, noResize, current, 1)
+            elif step == 1:
+                self.canvas.itemconfig(self.graphic[current][1], text=str(self._arr._vals[current]))
+                self.canvas.after(150, noResize, current, 2)
+            elif step == 2:
+                self._swap_color(current, "white")
+                self._swap_color(current+1, "white")
+                self.canvas.after(150, noResize, current+1, 0)
+
+        def resize(n, step):
+            # animation when resize is needed
+            def fill(which, step):
+                # filling up the new resized array
+                if which == self._length+1:
+                    # end filling
+                    self.canvas.after(500, resize, n, 2)
+                elif which < n:
+                    # before removal
+                    # just copy items from old array
+                    if step == 0:
+                        self._swap_color(which, "green")
+                        self._swap_color(which, "green", new_graphic)
+                        self._remove_dash(which, new_graphic)
+                        self.canvas.after(150, fill, which, 1)
+                    elif step == 1:
+                        self.canvas.itemconfig(new_graphic[which][1], text=str(self._arr._vals[which]))
+                        self.canvas.after(150, fill, which, 2)
+                    elif step == 2:
+                        self._swap_color(which, "white")
+                        self._swap_color(which, "white", new_graphic)
+                        self.canvas.after(150, fill, which+1, 0)
+                elif which == n:
+                    # removal point
+                    # indicate that this element is not copied with red
+                    if step == 0:
+                        self._swap_color(which, "red")
+                        self.canvas.after(150, fill, which+1, 0)
+                elif which > n:
+                    # after insertion
+                    # there is an offset between the arrays now
+                    if step == 0:
+                        self._swap_color(which, "green")
+                        self._swap_color(which-1, "green", new_graphic)
+                        self._remove_dash(which-1, new_graphic)
+                        self.canvas.after(150, fill, which, 1)
+                    elif step == 1:
+                        self.canvas.itemconfig(new_graphic[which-1][1], text=str(self._arr._vals[which-1]))
+                        self.canvas.after(150, fill, which, 2)
+                    elif step == 2:
+                        self._swap_color(which, "white")
+                        self._swap_color(which-1, "white", new_graphic)
+                        self.canvas.after(150, fill, which+1, 0)
+                
+
+            if step == 0:
+                # create new array, initially all dashed
+                for i in range(self._max_length):
+                    rect = self.canvas.create_rectangle(50*i+50,\
+                                                        self.canvas.winfo_reqheight()//2+75,\
+                                                        50*i+100,\
+                                                        self.canvas.winfo_reqheight()//2+125,\
+                                                        dash=(5,5), tag="new")
+                    text = self.canvas.create_text((50*i+75,\
+                                                    self.canvas.winfo_reqheight()//2+100),\
+                                                    text="",\
+                                                    tag="new")
+                    new_graphic.append((rect, text))
+
+                self.canvas.after(500, resize, n, 1)
+            elif step == 1:
+                # copy elements from the old array to new array
+                fill(0, 0)
+            elif step == 2:
+                # swap old array to new array
+                self.canvas.delete("old")
+                self.canvas.move("new", 0, -100)
+                self.graphic = new_graphic
+                return
+        
+        # test whether resize will be needed
+        # by checking if next element after the middle one is dashed or not
+        if self.canvas.itemcget(self.graphic[math.ceil(len(self.graphic)/2)][0], "dash") == "":
+            self._swap_color(n, "red")
+            self.canvas.after(250, noResize, n, 0)
+            #noResize(n, 0)
+        else:
+            # tag the old array as ' old'
+            self.canvas.addtag_all("old")
+
+            # for keeping the new array graphic
+            new_graphic = []
+
+            resize(n, 0)
 
 
-    def _removeLastNoResize_animation(self, step):
-        """Animation of removal from last place if no resizing is needed"""
-        pass
-
-
-    def _removeLastResize_animation(self, step):
-        """Animation of removal from last place if resizing is needed"""
-        pass
+    def _removeLast_animation(self):
+        """Animation of removeLast operation"""
+        self._remove_animation(self._length)
 
 
     def _update_animation(self, n, val, step):
@@ -266,7 +365,7 @@ class A_DArray(DArray):
         else:
             if step == 0:
                 # highlight the entry looked up
-                self.canvas.itemconfig(self.graphic[n][0], fill="green")
+                self._swap_color(n, "green")
                 self.canvas.after(500, self._update_animation, n, val, 1)
             elif step == 1:
                 # update the entry with value
@@ -274,7 +373,7 @@ class A_DArray(DArray):
                 self.canvas.after(1500, self._update_animation, n, val, 2)
             elif step == 2:
                 # clean up and finish
-                self.canvas.itemconfig(self.graphic[n][0], fill="white")
+                self._swap_color(n, "white")
                 return
 
 
@@ -282,27 +381,43 @@ class A_DArray(DArray):
         """Animation of the find operation"""
         if step == 0:
             # highlight current entry yellow and check if found value
-            self.canvas.itemconfig(self.graphic[n][0], fill="yellow")
+            self._swap_color(n, "yellow")
             if self._arr._vals[n] == val:
                 self.canvas.after(250, self._find_animation, val, 2, n)
             else:
                 self.canvas.after(500, self._find_animation, val, 1, n)
         elif n == self._length-1 and step < 2:
             # value not found, alert with red entry
-            self.canvas.itemconfig(self.graphic[n][0], fill="red")
+            self._swap_color(n, "red")
             self.canvas.after(500, self._find_animation, val, 3, n)
         elif step == 1:
             # value not found, move to next entry
-            self.canvas.itemconfig(self.graphic[n][0], fill="white")
+            self._swap_color(n, "white")
             self.canvas.after(0, self._find_animation, val, 0, n+1)
         elif step == 2:
             # value found, show value for 1.5s and return
-            self.canvas.itemconfig(self.graphic[n][0], fill="green")
-            self.canvas.after(1500, self._find_animation, val, 3, n)
+            self._swap_color(n, "green")
+            self.canvas.after(1000, self._find_animation, val, 3, n)
         elif step == 3:
             # clean up and finish
-            self.canvas.itemconfig(self.graphic[n][0], fill="white")
+            self._swap_color(n, "white")
             return
+
+
+    def _swap_color(self, index, color, graphic=None):
+        """Swap color of rectangle at given index"""
+        if graphic == None:
+            graphic = self.graphic
+
+        self.canvas.itemconfig(graphic[index][0], fill=color)
+
+
+    def _remove_dash(self, index, graphic=None):
+        """Remove dash of rectangle at given index"""
+        if graphic == None:
+            graphic = self.graphic
+
+        self.canvas.itemconfig(graphic[index][0], dash=())
 
 
     animations = [

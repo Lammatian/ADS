@@ -93,7 +93,7 @@ class DArray(object):
         :type n: int
         :type val: T
         """
-        if n < self._length and n >= 0:
+        if n <= self._length and n >= 0:
             if self._length < self._max_length:
                 self._arr = array.Array(self._max_length, self._arr._vals[:n] + [val] + self._arr._vals[n:self._length])
             else:
