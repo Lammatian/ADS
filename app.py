@@ -20,7 +20,8 @@ opBorderWidth = 2
 AVAILABLE_ANIMATIONS = [
     A_Array,
     A_DArray,
-    A_Stack
+    A_Stack,
+    A_Queue
 ]
 
 
@@ -117,6 +118,10 @@ class App(object):
         self.canvas = tk.Canvas(master)
         self.canvas.pack(pady=(50,0), fill=tk.BOTH, expand=True)
 
+        # return value label
+        self.returnVal = tk.Label(self.master, text="Return value", font=("OratorStd", 12))
+        self.returnVal.pack(side="bottom", anchor="w")
+
 
     def _load(self, what):
         """Loads appropriate data structure or algorithm"""
@@ -171,9 +176,14 @@ class App(object):
 
         if self._get_arguments(function):
             argDial = argDialog.ArgDialog(self.master, self._get_arguments(function), "Give parameters")
-            print(function(self.ds, *[ast.literal_eval(r) for r in argDial.result]))
+            result = function(self.ds, *[ast.literal_eval(r) for r in argDial.result])
         else:
-            print(function(self.ds))
+            result = function(self.ds)
+
+        if result != None:
+            self.returnVal['text'] = "Return value: " + str(result)
+        else:
+            self.returnVal['text'] = "No return value"
 
 
     def _get_arguments(self, function):
