@@ -50,7 +50,7 @@ class Stack(object):
 
         Do nothing if the stack is empty
         """
-        if not self.isEmpty():
+        if not self._stack._length == 0:
             self._stack.removeLast()
             last_top = self._top
 

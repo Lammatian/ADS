@@ -20,16 +20,16 @@ class A_Stack(Stack):
 
     def isEmpty(self):
         """Call isEmpty method of stack and animation"""
-        self._isEmpty_animation()
+        self._isEmpty_animation(0)
 
-        return self._stack._length == 0
+        return super(A_Stack, self).isEmpty()
 
 
     def peek(self):
         """Call peek method of stack and animation"""
         self._peek_animation(0)
 
-        return self._top
+        return super(A_Stack, self).peek()
 
 
     def push(self, value):
@@ -46,9 +46,14 @@ class A_Stack(Stack):
         return super(A_Stack, self).pop()
 
 
-    def _isEmpty_animation(self):
+    def _isEmpty_animation(self, step):
         """Animation of the isEmpty operation"""
-        pass
+        if step == 0:
+            self.canvas.itemconfig("rect", fill="green")
+            self.canvas.after(500, self._isEmpty_animation, 1)
+        elif step == 1:
+            self.canvas.itemconfig("rect", fill="white")
+            return
 
 
     def _peek_animation(self, step):
@@ -60,8 +65,6 @@ class A_Stack(Stack):
             elif step == 1:
                 self._swap_color("white")
                 return
-        else:
-            return
 
 
     def _push_animation(self, n, step):
@@ -71,10 +74,12 @@ class A_Stack(Stack):
                                                 300 - 30*(self._stack._length+1),\
                                                 350 + 45,\
                                                 300 - 30*(self._stack._length),\
-                                                fill="green")
+                                                fill="green",\
+                                                tag="rect")
             text = self.canvas.create_text(350,\
                                            300 - 30*self._stack._length - 15,\
-                                           text=str(n))
+                                           text=str(n),\
+                                           tag="text")
             self.graphic.append((rect, text))
             self.canvas.after(500, self._push_animation, n, 1)
         elif step == 1:

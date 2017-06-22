@@ -39,7 +39,7 @@ class Queue(object):
 
     def enqueue(self, n):
         """Append an element at the end of the queue"""
-        if self.isEmpty():
+        if self._queue.length == 0:
             self._front = n
         
         self._queue.insertLast(n)

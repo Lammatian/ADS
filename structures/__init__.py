@@ -9,3 +9,4 @@ from structures.queue import *
 from structures.anim_array import *
 from structures.anim_dynamicarray import *
 from structures.anim_stack import *
+from structures.anim_queue import *
