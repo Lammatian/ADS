@@ -9,6 +9,9 @@ class A_Queue(Queue):
 
     Each operation has its own animation
     """
+    # an axis in which queue is proportionally set in canvas
+    set_axis = "height"
+
     def __init__(self, canvas):
         """Initialise an empty queue"""
         super(A_Queue, self).__init__()

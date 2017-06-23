@@ -9,6 +9,9 @@ class A_Array(Array):
 
     Each operation has its own animation
     """
+    # axis in which array should stay proportionally set in canvas
+    set_axis = "height"
+
     def __init__(self, canvas, length, values=[]):
         """
         Initialise the array with obligatory length and optional initial values

@@ -114,13 +114,13 @@ class App(object):
         # fast exiting
         self.master.bind("<Key-q>", lambda event: self.master.quit())
 
-        # canvas for presenting data structures
-        self.canvas = tk.Canvas(master)
-        self.canvas.pack(pady=(50,0), fill=tk.BOTH, expand=True)
-
         # return value label
         self.returnVal = tk.Label(self.master, text="Return value", font=("OratorStd", 12))
         self.returnVal.pack(side="bottom", anchor="w")
+
+        # canvas for presenting data structures
+        self.canvas = ResizingCanvas(master)
+        self.canvas.pack(pady=(50,0), fill=tk.BOTH, expand=True)
 
 
     def _load(self, what):
@@ -161,6 +161,8 @@ class App(object):
             self.ds = what(self.canvas, *[ast.literal_eval(r) for r in argDial.result])
         else:
             self.ds = what(self.canvas)
+
+        self.canvas.item = self.ds
 
 
     def _perform(self, event=None):
@@ -205,6 +207,10 @@ class App(object):
         """Scroll up the option menu"""
         self.current_op = (self.current_op - 1)%len(self.operation_options)
         self.default.set(self.operation_options[self.current_op])
+
+
+    def _resize(self, event):
+        pass
 
 
 root = tk.Tk()

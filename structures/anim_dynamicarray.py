@@ -11,6 +11,8 @@ class A_DArray(DArray):
 
     Each operation has its own animation
     """
+    # an axis in which dynamic array is proportionally set in canvas
+    set_axis = "height"
 
     def __init__(self, canvas, values=[]):
         """

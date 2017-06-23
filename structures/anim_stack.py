@@ -9,6 +9,9 @@ class A_Stack(Stack):
 
     Each operation has its own animation
     """
+    # axis in which stack should stay proportionally set in canvas
+    set_axis = "width_bottom"
+
     def __init__(self, canvas):
         """Initialise an empty stack"""
         super(A_Stack, self).__init__()
@@ -70,14 +73,14 @@ class A_Stack(Stack):
     def _push_animation(self, n, step):
         """Animation of the push operation"""
         if step == 0:
-            rect = self.canvas.create_rectangle(350 - 45,\
-                                                300 - 30*(self._stack._length+1),\
-                                                350 + 45,\
-                                                300 - 30*(self._stack._length),\
+            rect = self.canvas.create_rectangle(self.canvas.winfo_reqwidth()//2 - 45,\
+                                                self.canvas.winfo_reqheight() - 30*(self._stack._length+1),\
+                                                self.canvas.winfo_reqwidth()//2 + 45,\
+                                                self.canvas.winfo_reqheight() - 30*(self._stack._length),\
                                                 fill="green",\
                                                 tag="rect")
-            text = self.canvas.create_text(350,\
-                                           300 - 30*self._stack._length - 15,\
+            text = self.canvas.create_text(self.canvas.winfo_reqwidth()//2,\
+                                           self.canvas.winfo_reqheight() - 30*self._stack._length - 15,\
                                            text=str(n),\
                                            tag="text")
             self.graphic.append((rect, text))
