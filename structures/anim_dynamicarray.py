@@ -223,7 +223,19 @@ class A_DArray(DArray):
             elif step == 2:
                 # move new array in place of the old one
                 self.canvas.delete("old")
-                self.canvas.move("new", 0, -100)
+
+                for obj in self.canvas.find_withtag("new"):
+                    if len(self.canvas.coords(obj)) == 4:
+                        # rect
+                        self.canvas.coords(obj, self.canvas.coords(obj)[0],\
+                                                self.canvas.winfo_reqheight()//2-25,\
+                                                self.canvas.coords(obj)[2],\
+                                                self.canvas.winfo_reqheight()//2+25)
+                    else:
+                        # text
+                        self.canvas.coords(obj, self.canvas.coords(obj)[0],\
+                                                self.canvas.winfo_reqheight()//2)
+                        
                 self.graphic = new_graphic
                 return
 

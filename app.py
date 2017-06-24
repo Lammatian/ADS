@@ -209,10 +209,6 @@ class App(object):
         self.default.set(self.operation_options[self.current_op])
 
 
-    def _resize(self, event):
-        pass
-
-
 root = tk.Tk()
 
 # load images

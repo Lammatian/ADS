@@ -1,4 +1,5 @@
 import tkinter as tk
+import math
 
 class ResizingCanvas(tk.Canvas):
     """
@@ -36,18 +37,24 @@ class ResizingCanvas(tk.Canvas):
                 for i in self.find_all():
                     if len(self.coords(i)) == 4:
                         # rectangles
+                        center = (self.coords(i)[1] + self.coords(i)[3])/2
+                        relative_height = center/(old_height+2)
                         obj_height = abs(self.coords(i)[1] - self.coords(i)[3])
-                        self.coords(i, self.coords(i)[0], self.winfo_reqheight()//2-obj_height//2, self.coords(i)[2], self.winfo_reqheight()//2+obj_height//2)
+                        self.coords(i, self.coords(i)[0], round(self.winfo_reqheight()*relative_height)-obj_height//2, self.coords(i)[2], round(self.winfo_reqheight()*relative_height)+obj_height//2)
                     else:
                         # text
-                        self.coords(i, self.coords(i)[0], self.winfo_reqheight()//2)
+                        relative_height = self.coords(i)[1]/(old_height+2)
+                        self.coords(i, self.coords(i)[0], round(self.winfo_reqheight()*relative_height))
             elif self.item.set_axis == "width_bottom":
                 for i in self.find_all():
                     if len(self.coords(i)) == 4:
                         # rectangles
                         # I have no idea why +2 is needed, may not work on other computers
+                        center = (self.coords(i)[0] + self.coords(i)[2])/2
+                        relative_width = center/(old_width+2)
                         obj_width = abs(self.coords(i)[0] - self.coords(i)[2])
-                        self.coords(i, self.winfo_reqwidth()//2-obj_width//2, self.winfo_reqheight() - (old_height - self.coords(i)[1] + 2), self.winfo_reqwidth()//2+obj_width//2, self.winfo_reqheight() - (old_height - self.coords(i)[3] + 2))
+                        self.coords(i, round(self.winfo_reqwidth()*relative_width)-obj_width//2, self.winfo_reqheight() - (old_height - self.coords(i)[1] + 2), round(self.winfo_reqwidth()*relative_width)+obj_width//2, self.winfo_reqheight() - (old_height - self.coords(i)[3] + 2))
                     else:
                         # text
-                        self.coords(i, self.winfo_reqwidth()//2, self.winfo_reqheight()- (old_height - self.coords(i)[1] + 2))
+                        relative_width = self.coords(i)[0]/(old_height+2)
+                        self.coords(i, round(self.winfo_reqwidth()*relative_width), self.winfo_reqheight()- (old_height - self.coords(i)[1] + 2))
