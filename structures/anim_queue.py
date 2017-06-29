@@ -9,8 +9,8 @@ class A_Queue(Queue):
 
     Each operation has its own animation
     """
-    # an axis in which queue is proportionally set in canvas
-    set_axis = "height"
+    # side to which animation is sticked
+    stick = "left"
 
     def __init__(self, canvas):
         """Initialise an empty queue"""
@@ -99,6 +99,7 @@ class A_Queue(Queue):
 
     def _dequeue_animation(self, step):
         """Animation of the dequeue method"""
+        # this should be changed in the future but let it stay for now
         if self.length > 0:
             if step == 0:
                 self._swap_color("red", 0)

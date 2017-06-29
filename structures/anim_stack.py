@@ -9,8 +9,8 @@ class A_Stack(Stack):
 
     Each operation has its own animation
     """
-    # axis in which stack should stay proportionally set in canvas
-    set_axis = "width_bottom"
+    # side to which animation is sticked
+    stick = "bottom"
 
     def __init__(self, canvas):
         """Initialise an empty stack"""
@@ -19,6 +19,21 @@ class A_Stack(Stack):
         # graphical representation of stack
         self.canvas = canvas
         self.graphic = []
+        self.length = 0
+
+        # pre-create the rectangles for better resizing alignment
+        for i in range(1000):
+            rect = self.canvas.create_rectangle(self.canvas.winfo_reqwidth()//2 - 45,\
+                                                self.canvas.winfo_reqheight() - 30*(i+2),\
+                                                self.canvas.winfo_reqwidth()//2 + 45,\
+                                                self.canvas.winfo_reqheight() - 30*(i+1),\
+                                                state="hidden",\
+                                                fill="green")
+            text = self.canvas.create_text(self.canvas.winfo_reqwidth()//2,\
+                                           self.canvas.winfo_reqheight() - 30*i -45,\
+                                           state="hidden",\
+                                           text="")
+            self.graphic.append((rect, text))
 
 
     def isEmpty(self):
@@ -73,37 +88,31 @@ class A_Stack(Stack):
     def _push_animation(self, n, step):
         """Animation of the push operation"""
         if step == 0:
-            rect = self.canvas.create_rectangle(self.canvas.winfo_reqwidth()//2 - 45,\
-                                                self.canvas.winfo_reqheight() - 30*(self._stack._length+1),\
-                                                self.canvas.winfo_reqwidth()//2 + 45,\
-                                                self.canvas.winfo_reqheight() - 30*(self._stack._length),\
-                                                fill="green",\
-                                                tag="rect")
-            text = self.canvas.create_text(self.canvas.winfo_reqwidth()//2,\
-                                           self.canvas.winfo_reqheight() - 30*self._stack._length - 15,\
-                                           text=str(n),\
-                                           tag="text")
-            self.graphic.append((rect, text))
+            self.canvas.itemconfig(self.graphic[self.length][0], state="normal")
+            self.canvas.itemconfig(self.graphic[self.length][1], state="normal", text=str(n))
             self.canvas.after(500, self._push_animation, n, 1)
         elif step == 1:
-            self._swap_color("white")
+            self._swap_color("white", self.length)
+            self.length += 1
             return
 
     
     def _pop_animation(self, step):
         """Animation of the pop operation"""
-        if step == 0:
-            self._swap_color("red")
-            self.canvas.after(500, self._pop_animation, 1)
-        elif step == 1:
-            self.canvas.delete(*self.graphic[-1])
-            self.graphic = self.graphic[:-1]
-            return
+        if self.length > 0:
+            if step == 0:
+                self._swap_color("red", self.length-1)
+                self.canvas.after(500, self._pop_animation, 1)
+            elif step == 1:
+                self.canvas.itemconfig(self.graphic[self.length-1][0], state="hidden", fill="green")
+                self.canvas.itemconfig(self.graphic[self.length-1][1], state="hidden", text="")
+                self.length -= 1
+                return
 
 
-    def _swap_color(self, color):
+    def _swap_color(self, color, index):
         """Swap color of a rectangle"""
-        self.canvas.itemconfig(self.graphic[-1][0], fill=color)
+        self.canvas.itemconfig(self.graphic[index][0], fill=color)
 
 
     animations = [
