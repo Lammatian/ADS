@@ -7,6 +7,7 @@ from types import FunctionType
 import argDialog
 import ast # to pass proper arguments
 from resizingCanvas import ResizingCanvas
+import tkinter.messagebox as mbox # for help messages
 
 from structures import *
 
@@ -21,7 +22,8 @@ AVAILABLE_ANIMATIONS = [
     A_Array,
     A_DArray,
     A_Stack,
-    A_Queue
+    A_Queue,
+    A_LinkedList
 ]
 
 
@@ -111,6 +113,9 @@ class App(object):
         self.master.bind("<Down>", self._down_scroll)
         self.master.bind("<Up>", self._up_scroll)
 
+        # for getting function documentation
+        self.master.bind("<Key-h>", self._get_help)
+
         # fast exiting
         self.master.bind("<Key-q>", lambda event: self.master.quit())
 
@@ -195,6 +200,13 @@ class App(object):
             return function.__code__.co_varnames[2:function.__code__.co_argcount]
         else:
             return function.__code__.co_varnames[1:function.__code__.co_argcount]
+
+
+    def _get_help(self, event):
+        """Get help for chosen operation"""
+        if self.ds:
+            mbox.showinfo("{}: {}".format(self.ds._title, self.public_functions[self.default.get()].__name__),\
+                          "How the hell do you get docstring of super function?")
 
 
     def _down_scroll(self, event):

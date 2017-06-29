@@ -21,7 +21,7 @@ class A_Array(Array):
         :param canvas: canvas on which the array will be drawn
         :type length: int
         :type values: T[]
-        :type canvas: tkinter.Canvas
+        :type canvas: ResizingCanvas
         """
         super(A_Array, self).__init__(length, values)
 
