@@ -32,29 +32,12 @@ class ResizingCanvas(tk.Canvas):
         self.config(width=self.width, height=self.height)
         # move all the objects tagged with "all" tag (by addtag_all method)
         if self.item:
-            # move all items to the middle
-            if self.item.set_axis == "height":
-                for i in self.find_all():
-                    if len(self.coords(i)) == 4:
-                        # rectangles
-                        center = (self.coords(i)[1] + self.coords(i)[3])/2
-                        relative_height = center/(old_height+2)
-                        obj_height = abs(self.coords(i)[1] - self.coords(i)[3])
-                        self.coords(i, self.coords(i)[0], round(self.winfo_reqheight()*relative_height)-obj_height//2, self.coords(i)[2], round(self.winfo_reqheight()*relative_height)+obj_height//2)
-                    else:
-                        # text
-                        relative_height = self.coords(i)[1]/(old_height+2)
-                        self.coords(i, self.coords(i)[0], round(self.winfo_reqheight()*relative_height))
-            elif self.item.set_axis == "width_bottom":
-                for i in self.find_all():
-                    if len(self.coords(i)) == 4:
-                        # rectangles
-                        # I have no idea why +2 is needed, may not work on other computers
-                        center = (self.coords(i)[0] + self.coords(i)[2])/2
-                        relative_width = center/(old_width+2)
-                        obj_width = abs(self.coords(i)[0] - self.coords(i)[2])
-                        self.coords(i, round(self.winfo_reqwidth()*relative_width)-obj_width//2, self.winfo_reqheight() - (old_height - self.coords(i)[1] + 2), round(self.winfo_reqwidth()*relative_width)+obj_width//2, self.winfo_reqheight() - (old_height - self.coords(i)[3] + 2))
-                    else:
-                        # text
-                        relative_width = self.coords(i)[0]/(old_height+2)
-                        self.coords(i, round(self.winfo_reqwidth()*relative_width), self.winfo_reqheight()- (old_height - self.coords(i)[1] + 2))
+            # move all items to stay where they relatively were
+            if self.item.stick == "left":
+                # some cool maths (count relative height of object and move to stay at the same relative height)
+                relative_height = (self.coords(self.find_all()[0])[1] + self.coords(self.find_all()[0])[3])/(2*(old_height+2))
+                self.move("all", 0, (self.height-old_height)*relative_height)
+            elif self.item.stick == "bottom":
+                # count relative width and move to stay at the same relative width
+                relative_width = (self.coords(self.find_all()[0])[0] + self.coords(self.find_all()[0])[2])/(2*(old_width+2))
+                self.move("all", (self.width-old_width)*relative_width, self.height-old_height)
