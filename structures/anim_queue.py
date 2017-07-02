@@ -28,10 +28,12 @@ class A_Queue(Queue):
                                                 30*i+80,\
                                                 self.canvas.winfo_reqheight()//2+25,\
                                                 state="hidden",\
+                                                tag="off",\
                                                 fill="green")
             text = self.canvas.create_text(30*i+65,\
                                            self.canvas.winfo_reqheight()//2,\
                                            state="hidden",\
+                                           tag="text",\
                                            text="")
             self.graphic.append((rect, text))
 
@@ -67,10 +69,10 @@ class A_Queue(Queue):
     def _isEmpty_animation(self, step):
         """Animation of isEmpty method"""
         if step == 0:
-            self.canvas.itemconfig("rect", fill="green")
+            self.canvas.itemconfig("on", fill="green")
             self.canvas.after(500, self._isEmpty_animation, 1)
         elif step == 1:
-            self.canvas.itemconfig("rect", fill="white")
+            self.canvas.itemconfig("on", fill="white")
             return
 
 
@@ -78,17 +80,19 @@ class A_Queue(Queue):
         """Animation of peek method"""
         if self.graphic:
             if step == 0:
-                self._swap_color("green", -1)
+                self._swap_color("green", 0)
                 self.canvas.after(500, self._peek_animation, 1)
             elif step == 1:
-                self._swap_color("white", -1)
+                self._swap_color("white", 0)
                 return
 
 
     def _enqueue_animation(self, n, step):
         """Animation of the enqueue method"""
         if step == 0:
-            self.canvas.itemconfig(self.graphic[self.length][0], state="normal")
+            # rectangle
+            self.canvas.itemconfig(self.graphic[self.length][0], state="normal", tag="on")
+            # text
             self.canvas.itemconfig(self.graphic[self.length][1], state="normal", text=str(n))
             self.canvas.after(500, self._enqueue_animation, n, 1)
         elif step == 1:
@@ -112,6 +116,7 @@ class A_Queue(Queue):
                                              30*999+80,\
                                              self.canvas.winfo_reqheight()//2+25,\
                                              state="hidden",\
+                                             tag="off",\
                                              fill="green")
                 text = self.canvas.create_text(30*999+65,\
                                         self.canvas.winfo_reqheight()//2,\
