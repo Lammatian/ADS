@@ -1,4 +1,5 @@
 import sys
+import math
 sys.path.append('../')
 
 from structures.linkedlist import *
@@ -22,6 +23,7 @@ class A_LinkedList(LinkedList):
         :type values: int[]
         """
         super(A_LinkedList, self).__init__(values)
+        self._length = len(values)
 
         # graphical representation of the linked list
         self.canvas = canvas
@@ -43,7 +45,10 @@ class A_LinkedList(LinkedList):
 
             if i < self.length-1:
                 # arrow between nodes
-                arrow = self._draw_arrow(100*i+100, self.canvas.winfo_reqheight()//2)
+                arrow = self._draw_arrow(100*i+100,\
+                                         self.canvas.winfo_reqheight()//2,\
+                                         100*i+150,\
+                                         self.canvas.winfo_reqheight()//2)
                 self.arrows.append(arrow)
 
 
@@ -56,7 +61,7 @@ class A_LinkedList(LinkedList):
 
     def insert(self, value, node): 
         """Call insert of linkedlist and animation"""
-        self._insert_animation(value, node)
+        self._insert_animation(value, node, 0)
         
         super(A_LinkedList, self).insert(value, self._nodeAt(node))
 
@@ -91,6 +96,9 @@ class A_LinkedList(LinkedList):
 
     def _lookup_animation(self, index, n, step):
         """Animation of the lookup operation"""
+        if index < 0 or index >= self.length:
+            return
+
         if n < index:
             if step == 0:
                 self._swap_color("rect", n, "yellow")
@@ -102,7 +110,7 @@ class A_LinkedList(LinkedList):
             elif step == 2:
                 self._swap_color("arr", n, "black")
                 self.canvas.after(250, self._lookup_animation, index, n+1, 0)
-        else:
+        elif n == index:
             if step == 0:
                 self._swap_color("rect", n, "green")
                 self.canvas.after(500, self._lookup_animation, index, n, 1)
@@ -111,14 +119,92 @@ class A_LinkedList(LinkedList):
                 return
 
 
-    def _insert_animation(self, value, node):
+    def _insert_animation(self, value, node, step):
         """Animation of the insert operation"""
-        pass
+        if node < self.length:
+            if step == 0:
+                # new node
+                rect = self.canvas.create_rectangle(100*(node+1),\
+                                                    self.canvas.winfo_reqheight()//2-100,\
+                                                    100*(node+1)+50,\
+                                                    self.canvas.winfo_reqheight()//2-50,\
+                                                    fill="green",\
+                                                    tag="new")
+                text = self.canvas.create_text(100*(node+1)+25,\
+                                               self.canvas.winfo_reqheight()//2-75,\
+                                               text=str(value),\
+                                               tag="new")
+                self.nodes.insert(node, (rect, text))
+                self.canvas.after(300, self._insert_animation, value, node, 1)
+            elif step == 1:
+                # delete old and add new arrows
+                if node >= 0 and node < self._length-1:
+                    self.canvas.delete(*self.arrows[node])
+
+                # from previous
+                if node >= 0:
+                    arrow = self._draw_arrow(100*(node+1)-25,\
+                                             self.canvas.winfo_reqheight()//2-25,\
+                                             100*(node+1),\
+                                             self.canvas.winfo_reqheight()//2-75,
+                                             tag="temp")
+
+                # to next
+                if node < self._length-1:
+                    arrow = self._draw_arrow(100*(node+1)+50,\
+                                             self.canvas.winfo_reqheight()//2-75,\
+                                             100*(node+1)+75,\
+                                             self.canvas.winfo_reqheight()//2-25,
+                                             tag="temp")
+
+                self.canvas.after(300, self._insert_animation, value, node, 2)
+            elif step == 2:
+                # move the node to its place and finish
+                # move all items after inserted one to the left
+                end_x = self.canvas.coords(self.nodes[-1][0])[2]
+                self.canvas.addtag_overlapping("move",\
+                                               100*(node+1)+50,\
+                                               self.canvas.winfo_reqheight()//2+10,\
+                                               end_x,\
+                                               self.canvas.winfo_reqheight()//2-10)
+
+                self.canvas.move("move", 100, 0)
+
+                # remove arrows and clean up tags
+                self.canvas.delete("temp")
+                self.canvas.dtag("move", "move")
+
+                # move new node to its position
+                self.canvas.move("new", 50, 75)
+                self.canvas.dtag("new", "new")
+
+                # draw new arrows
+                if node >= 0:
+                    arrow = self._draw_arrow(100*(node+1),\
+                                             self.canvas.winfo_reqheight()//2,\
+                                             100*(node+1)+50,\
+                                             self.canvas.winfo_reqheight()//2)
+
+                    self.arrows.insert(node, arrow)
+
+                if node < self._length-1:
+                    arrow = self._draw_arrow(100*(node+2),\
+                                             self.canvas.winfo_reqheight()//2,\
+                                             100*(node+2)+50,\
+                                             self.canvas.winfo_reqheight()//2)
+
+                    self.arrows.insert(node+1, arrow)
+
+                self._length += 1
+                self.canvas.after(300, self._insert_animation, value, node, 3)
+            elif step == 3:
+                self._swap_color("rect", node, "white")
+                return
 
 
     def _insertFirst_animation(self, value):
         """Animation of the insertFirst operation"""
-        self._insert_animation(value, 0)
+        pass
 
 
     def _remove_animation(self, node):
@@ -136,10 +222,47 @@ class A_LinkedList(LinkedList):
         pass
 
 
-    def _draw_arrow(self, start_x, start_y):
+    def _draw_arrow(self, x1, y1, x2, y2, tag=None):
         """Draw an arrow from one place to another"""
-        line = self.canvas.create_line((start_x, start_y), (start_x+50, start_y))
-        poly = self.canvas.create_polygon((start_x+37, start_y+5), (start_x+50, start_y), (start_x+37, start_y-5))
+        line = self.canvas.create_line((x1, y1), (x2, y2))
+        poly = self.canvas.create_polygon((x2-13, y2+5),\
+                                          (x2, y2),\
+                                          (x2-13, y2-5))
+
+        if y2 != y1:
+            # negative because the coords of window are oriented the other way
+            turn = -math.atan((y2-y1)/(x2-x1))
+        else:
+            turn = 0
+
+        x0, y0 = self.canvas.coords(poly)[:2]
+        x1, y1 = self.canvas.coords(poly)[2:4]
+        x2, y2 = self.canvas.coords(poly)[4:]
+        # rotating about the arrowhead
+        cx, cy = x1, y1
+
+        if turn != 0:
+            # translate to center
+            x0 = x0 - cx
+            y0 = y0 - cy
+            # rotate
+            _x0 = x0 * math.cos(turn) + y0 * math.sin(turn)
+            _y0 = -x0 * math.sin(turn) + y0 * math.cos(turn)
+
+            # translate to center
+            x2 = x2 - cx
+            y2 = y2 - cy
+            # rotate
+            _x2 = x2 * math.cos(turn) + y2 * math.sin(turn)
+            _y2 = -x2 * math.sin(turn) + y2 * math.cos(turn)
+
+            # set the coordinates to the rotated ones
+            self.canvas.coords(poly, [_x0 + cx, _y0 + cy, x1, y1, _x2 + cx, _y2 + cy])
+
+        if tag:
+            self.canvas.itemconfig(line, tag=tag)
+            self.canvas.itemconfig(poly, tag=tag)
+
         return (line, poly)
 
 
@@ -157,11 +280,14 @@ class A_LinkedList(LinkedList):
         Returns node at given index
         Necessary to call super methods
         """
-        node = self.head
+        dummy = self.head
 
         while index > 0:
-            node = node.next
+            self.head = self.head.next
             index -= 1
+
+        node = self.head
+        self.head = dummy
 
         return node
 
